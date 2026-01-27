@@ -300,3 +300,8 @@
     - Implementar testes de fluxo completo de usuário
     - Testar integração entre frontend e backend
     - Validar funcionamento em ambiente de produção
+
+
+
+
+Caso não tenha deixado claro anteriormente, os membros poderão editar somente seus dados individuais.
