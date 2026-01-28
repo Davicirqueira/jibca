@@ -103,11 +103,6 @@ CREATE TRIGGER update_events_updated_at BEFORE UPDATE ON events
 CREATE TRIGGER update_confirmations_updated_at BEFORE UPDATE ON confirmations
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Inserir usuário líder padrão (Tio Chris)
--- Senha padrão: "jibca2024" (deve ser alterada no primeiro login)
-INSERT INTO users (name, email, password_hash, role) VALUES
-    ('Tio Chris', 'chris@jibca.org', '$2b$10$rQZ8kHWKQVnqVQVnqVQVnO8kHWKQVnqVQVnqVQVnqVQVnqVQVnqVQ', 'leader');
-
 -- Comentários nas tabelas
 COMMENT ON TABLE users IS 'Usuários do sistema (líderes e membros da juventude)';
 COMMENT ON TABLE events IS 'Eventos da juventude JIBCA';

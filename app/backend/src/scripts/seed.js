@@ -145,4 +145,3 @@ if (require.main === module) {
 }
 
 module.exports = { seedDatabase };
-console.log('Seed script placeholder');

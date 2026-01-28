@@ -96,15 +96,21 @@
     - **Property 9: Member deactivation integrity**
     - **Validates: Requirements 2.4**
 
-- [ ] 5. Implementar gestão de eventos
-  - [ ] 5.1 Criar EventRepository para acesso a dados
+- [x] 5. Implementar gestão de eventos
+
+
+  - [x] 5.1 Criar EventRepository para acesso a dados
+
+
     - Implementar métodos CRUD para eventos
     - Implementar consultas com filtros (tipo, data, futuro)
     - Implementar consultas para calendário mensal
     - Implementar cascade delete para confirmações
     - _Requirements: 3.1, 3.2, 3.3, 4.1, 4.3, 4.4_
 
-  - [ ] 5.2 Implementar EventController
+  - [x] 5.2 Implementar EventController
+
+
     - Criar endpoint POST /events para criação (apenas Líder)
     - Criar endpoint GET /events para listagem com filtros
     - Criar endpoint GET /events/:id para detalhes completos
@@ -124,15 +130,21 @@
     - **Property 16: Future events filtering**
     - **Validates: Requirements 4.1**
 
-- [ ] 6. Implementar sistema de confirmações
-  - [ ] 6.1 Criar ConfirmationRepository
+- [x] 6. Implementar sistema de confirmações
+
+
+  - [x] 6.1 Criar ConfirmationRepository
+
+
     - Implementar métodos para criar/atualizar confirmações
     - Implementar consultas para listagem por evento
     - Implementar cálculo de estatísticas de confirmação
     - Implementar constraint de unicidade (um usuário por evento)
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ] 6.2 Implementar ConfirmationController
+  - [x] 6.2 Implementar ConfirmationController
+
+
     - Criar endpoint POST /events/:id/confirmations para confirmação
     - Criar endpoint GET /events/:id/confirmations para listagem
     - Implementar validação de status válidos
@@ -147,15 +159,21 @@
     - **Property 24: Confirmation counter accuracy**
     - **Validates: Requirements 5.4**
 
-- [ ] 7. Implementar sistema de notificações
-  - [ ] 7.1 Criar NotificationRepository
+- [x] 7. Implementar sistema de notificações
+
+
+  - [x] 7.1 Criar NotificationRepository
+
+
     - Implementar métodos para criar notificações
     - Implementar consultas para listagem por usuário
     - Implementar marcação de leitura
     - Implementar contagem de não lidas
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-  - [ ] 7.2 Implementar NotificationService com agendamento
+  - [x] 7.2 Implementar NotificationService com agendamento
+
+
     - Criar serviço para envio de lembretes automáticos
     - Implementar job para lembrete de 24 horas
     - Implementar job para lembrete de 1 hora
@@ -163,7 +181,9 @@
     - Configurar node-cron para execução automática
     - _Requirements: 6.1, 6.2, 6.3_
 
-  - [ ] 7.3 Implementar NotificationController
+  - [x] 7.3 Implementar NotificationController
+
+
     - Criar endpoint GET /notifications para listagem
     - Criar endpoint PUT /notifications/:id/read para marcar como lida
     - Criar endpoint PUT /notifications/read-all para marcar todas
@@ -177,7 +197,10 @@
     - **Property 27: Hourly reminder targeting**
     - **Validates: Requirements 6.2**
 
-- [ ] 8. Checkpoint - Verificar funcionamento do backend
+- [x] 8. Checkpoint - Verificar funcionamento do backend
+
+
+
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 9. Implementar frontend React
@@ -305,3 +328,6 @@
 
 
 Caso não tenha deixado claro anteriormente, os membros poderão editar somente seus dados individuais.
+
+
+Gostaria que implementasse um card/modal que a cada dia mostre um versículo, com título: "Versículo do dia ❤🙌"

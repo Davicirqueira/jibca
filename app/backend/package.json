@@ -10,7 +10,8 @@
     "test:watch": "jest --watch",
     "migrate": "node src/scripts/migrate.js",
     "seed": "node src/scripts/seed.js",
-    "setup": "npm run migrate && npm run seed"
+    "setup": "npm run migrate && npm run seed",
+    "check": "node check-setup.js"
   },
   "keywords": ["jibca", "agenda", "juventude", "igreja"],
   "author": "JIBCA",

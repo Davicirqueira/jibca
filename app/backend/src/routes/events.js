@@ -72,15 +72,19 @@ const listValidation = [
 ];
 
 // Rotas de eventos
+router.get('/types', auth, EventController.getEventTypes);
+router.get('/stats', auth, requireRole('leader'), EventController.getStats);
+router.get('/calendar', auth, EventController.getCalendar);
 router.post('/', auth, requireRole('leader'), createEventValidation, EventController.create);
 router.get('/', auth, listValidation, EventController.list);
-router.get('/calendar', auth, EventController.getCalendar);
 router.get('/:id', auth, EventController.getById);
 router.put('/:id', auth, requireRole('leader'), createEventValidation, EventController.update);
 router.delete('/:id', auth, requireRole('leader'), EventController.delete);
 
 // Rotas de confirmação de presença
+router.get('/:id/confirmations/me', auth, ConfirmationController.getMyConfirmation);
 router.post('/:id/confirmations', auth, confirmationValidation, ConfirmationController.create);
 router.get('/:id/confirmations', auth, ConfirmationController.getByEvent);
+router.delete('/:id/confirmations', auth, ConfirmationController.delete);
 
 module.exports = router;

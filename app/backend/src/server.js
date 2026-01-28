@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const eventRoutes = require('./routes/events');
+const confirmationRoutes = require('./routes/confirmations');
 const notificationRoutes = require('./routes/notifications');
 const { startNotificationScheduler } = require('./services/NotificationService');
 
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/events', eventRoutes);
+app.use('/api/v1/confirmations', confirmationRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 
 // Rota de health check
@@ -87,9 +89,16 @@ app.listen(PORT, () => {
   console.log(`🚀 Servidor JIBCA Agenda rodando na porta ${PORT}`);
   console.log(`📅 Ambiente: ${process.env.NODE_ENV || 'development'}`);
   
-  // Iniciar agendador de notificações
-  startNotificationScheduler();
-  console.log('📬 Sistema de notificações iniciado');
+  // Iniciar agendador de notificações após um pequeno delay
+  setTimeout(() => {
+    try {
+      startNotificationScheduler();
+      console.log('📬 Sistema de notificações iniciado');
+    } catch (error) {
+      console.error('❌ Erro ao iniciar sistema de notificações:', error.message);
+      console.log('📬 Servidor continuará funcionando sem notificações automáticas');
+    }
+  }, 2000);
 });
 
 module.exports = app;
