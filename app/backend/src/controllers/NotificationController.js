@@ -468,4 +468,3 @@ class NotificationController {
 }
 
 module.exports = NotificationController;
-module.exports = {};

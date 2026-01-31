@@ -380,4 +380,3 @@ class EventRepository {
 }
 
 module.exports = EventRepository;
-module.exports = {};

@@ -61,14 +61,6 @@ class NotificationService {
       console.log('📬 Continuando sem agendador de notificações...');
     }
   }
-    }, {
-      scheduled: true,
-      timezone: 'America/Sao_Paulo'
-    });
-
-    this.isSchedulerRunning = true;
-    console.log('✅ Agendador de notificações iniciado com sucesso');
-  }
 
   /**
    * Parar agendador de notificações
@@ -321,4 +313,3 @@ class NotificationService {
 }
 
 module.exports = NotificationService;
-module.exports = {};

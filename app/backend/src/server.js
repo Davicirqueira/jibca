@@ -7,7 +7,7 @@ const userRoutes = require('./routes/users');
 const eventRoutes = require('./routes/events');
 const confirmationRoutes = require('./routes/confirmations');
 const notificationRoutes = require('./routes/notifications');
-const { startNotificationScheduler } = require('./services/NotificationService');
+const NotificationService = require('./services/NotificationService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -92,7 +92,7 @@ app.listen(PORT, () => {
   // Iniciar agendador de notificações após um pequeno delay
   setTimeout(() => {
     try {
-      startNotificationScheduler();
+      NotificationService.startNotificationScheduler();
       console.log('📬 Sistema de notificações iniciado');
     } catch (error) {
       console.error('❌ Erro ao iniciar sistema de notificações:', error.message);

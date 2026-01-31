@@ -526,4 +526,3 @@ class EventController {
 }
 
 module.exports = EventController;
-module.exports = {};

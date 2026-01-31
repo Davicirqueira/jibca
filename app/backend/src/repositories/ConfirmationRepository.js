@@ -343,4 +343,3 @@ class ConfirmationRepository {
 }
 
 module.exports = ConfirmationRepository;
-module.exports = {};

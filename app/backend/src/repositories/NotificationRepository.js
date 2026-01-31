@@ -438,4 +438,3 @@ class NotificationRepository {
 }
 
 module.exports = NotificationRepository;
-module.exports = {};

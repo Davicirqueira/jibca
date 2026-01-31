@@ -430,4 +430,3 @@ class ConfirmationController {
 }
 
 module.exports = ConfirmationController;
-module.exports = {};

@@ -204,35 +204,48 @@
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 9. Implementar frontend React
-  - [ ] 9.1 Configurar estrutura base do frontend
+  - [x] 9.1 Configurar estrutura base do frontend
+
+
+
     - Configurar Vite com React e TypeScript
     - Configurar TailwindCSS para estilização
     - Configurar React Router para navegação
     - Configurar Axios para chamadas HTTP
     - Criar estrutura de pastas (components, pages, services, context)
+
     - _Requirements: 8.1, 8.2_
 
-  - [ ] 9.2 Implementar Context de Autenticação
+  - [x] 9.2 Implementar Context de Autenticação
+
     - Criar AuthContext para gerenciamento de estado
     - Implementar hooks useAuth para acesso ao contexto
     - Implementar persistência de token no localStorage
+
     - Criar componente ProtectedRoute para rotas protegidas
     - _Requirements: 1.1, 1.3, 1.4, 1.5_
+
 
   - [ ] 9.3 Implementar tela de Login
     - Criar componente LoginForm com validação
     - Implementar integração com API de autenticação
     - Implementar redirecionamento baseado em role
+
+
     - Implementar feedback visual para erros
     - _Requirements: 1.1, 1.2, 8.2_
 
 - [ ] 10. Implementar interface de eventos
-  - [ ] 10.1 Criar componentes de listagem de eventos
+  - [x] 10.1 Criar componentes de listagem de eventos
+
+
+
     - Implementar EventList com paginação
     - Implementar EventCard para exibição resumida
     - Implementar filtros por tipo de evento
     - Implementar filtro para eventos futuros
     - _Requirements: 4.1, 4.3, 8.1_
+
 
   - [ ] 10.2 Implementar visualização detalhada de eventos
     - Criar componente EventDetails
@@ -241,22 +254,31 @@
     - Implementar botão de confirmação de presença
     - _Requirements: 4.2, 5.3, 5.4_
 
-  - [ ] 10.3 Implementar calendário de eventos
+  - [x] 10.3 Implementar calendário de eventos
+
+
+
     - Criar componente EventCalendar
     - Implementar visualização mensal
     - Implementar navegação entre meses
     - Implementar integração com dados de eventos
+
+
+
     - _Requirements: 4.4_
 
   - [ ] 10.4 Implementar formulário de eventos (apenas Líder)
     - Criar componente EventForm para criação/edição
     - Implementar validação de campos obrigatórios
+
     - Implementar seleção de tipos de evento
     - Implementar integração com API de eventos
     - _Requirements: 3.1, 3.2, 3.4_
 
 - [ ] 11. Implementar interface de gestão de membros (apenas Líder)
-  - [ ] 11.1 Criar listagem de membros
+  - [x] 11.1 Criar listagem de membros
+
+
     - Implementar MemberList com paginação
     - Implementar MemberCard para exibição
     - Implementar filtros por status ativo/inativo
