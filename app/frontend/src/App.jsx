@@ -10,6 +10,8 @@ import EventsPage from './pages/EventsPage'
 import EventDetailsPage from './pages/EventDetailsPage'
 import CreateEventPage from './pages/CreateEventPage'
 import EditEventPage from './pages/EditEventPage'
+import CreateMemberPage from './pages/CreateMemberPage'
+import EditMemberPage from './pages/EditMemberPage'
 import CalendarPage from './pages/CalendarPage'
 import MembersPage from './pages/MembersPage'
 import NotificationsPage from './pages/NotificationsPage'
@@ -78,6 +80,22 @@ function App() {
               <ProtectedRoute requiredRole="leader">
                 <Layout>
                   <MembersPage />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/members/create" element={
+              <ProtectedRoute requiredRole="leader">
+                <Layout>
+                  <CreateMemberPage />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/members/:id/edit" element={
+              <ProtectedRoute requiredRole="leader">
+                <Layout>
+                  <EditMemberPage />
                 </Layout>
               </ProtectedRoute>
             } />

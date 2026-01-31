@@ -1,0 +1,66 @@
+# Docker Compose para produção do JIBCA
+
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jibca-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./ssl:/etc/ssl/certs:ro
+      - ./logs:/var/log/nginx
+    environment:
+      - NODE_ENV=production
+    networks:
+      - jibca-network
+    depends_on:
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jibca-frontend.rule=Host(`jibca.com.br`)"
+      - "traefik.http.routers.jibca-frontend.tls=true"
+      - "traefik.http.routers.jibca-frontend.tls.certresolver=letsencrypt"
+
+  backend:
+    image: jibca-backend:latest
+    container_name: jibca-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://user:password@postgres:5432/jibca_prod
+    networks:
+      - jibca-network
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: jibca-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=jibca_prod
+      - POSTGRES_USER=jibca_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    networks:
+      - jibca-network
+    ports:
+      - "5432:5432"
+
+networks:
+  jibca-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

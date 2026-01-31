@@ -1,20 +1,19 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import MemberList from '../components/MemberList'
-import toast from 'react-hot-toast'
 import { Shield } from 'lucide-react'
 
 const MembersPage = () => {
   const { isLeader } = useAuth()
+  const navigate = useNavigate()
 
   const handleCreateMember = () => {
-    // Navegar para página de criação de membro (será implementada na próxima task)
-    toast.info('Formulário de criação de membro será implementado na próxima task')
+    navigate('/members/create')
   }
 
   const handleEditMember = (member) => {
-    // Navegar para página de edição de membro (será implementada na próxima task)
-    toast.info(`Edição do membro ${member.name} será implementada na próxima task`)
+    navigate(`/members/${member.id}/edit`)
   }
 
   // Verificar permissão de líder

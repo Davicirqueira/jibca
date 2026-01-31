@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import EventCalendar from '../components/EventCalendar'
+import VerseOfTheDay from '../components/VerseOfTheDay'
 import { 
   Calendar, 
   CalendarDays, 
@@ -219,6 +220,9 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Versículo do Dia Modal */}
+      <VerseOfTheDay />
     </div>
   )
 }

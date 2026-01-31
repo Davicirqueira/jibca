@@ -4,12 +4,20 @@
   "description": "Frontend do Sistema de Agenda da Juventude JIBCA",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "vite --mode development",
+    "build": "vite build --mode production",
+    "build:dev": "vite build --mode development",
     "preview": "vite preview",
+    "preview:prod": "vite preview --mode production",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext js,jsx,ts,tsx --fix",
+    "analyze": "vite-bundle-analyzer dist/stats.html",
+    "clean": "rm -rf dist",
+    "deploy:build": "npm run clean && npm run build",
+    "serve:prod": "npm run build && npm run preview:prod"
   },
   "dependencies": {
     "axios": "^1.6.2",

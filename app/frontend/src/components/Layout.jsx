@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import NotificationBadge from './NotificationBadge'
+import MobileNavigation from './MobileNavigation'
 import { 
   Home, 
   Calendar, 
@@ -34,7 +36,7 @@ const Layout = ({ children }) => {
     { name: 'Dashboard', href: '/', icon: Home },
     { name: 'Eventos', href: '/events', icon: Calendar },
     { name: 'Calendário', href: '/calendar', icon: CalendarDays },
-    { name: 'Notificações', href: '/notifications', icon: Bell },
+    { name: 'Notificações', href: '/notifications', icon: Bell, badge: true },
     ...(isLeader() ? [{ name: 'Membros', href: '/members', icon: Users }] : []),
     { name: 'Perfil', href: '/profile', icon: User },
   ]
@@ -47,7 +49,7 @@ const Layout = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-16 md:pb-0">
       {/* Header Corporativo */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,7 +60,7 @@ const Layout = ({ children }) => {
                 <div className="p-2 bg-blue-600 rounded-lg group-hover:bg-blue-700 transition-colors duration-200">
                   <Church className="w-6 h-6 text-white" />
                 </div>
-                <div>
+                <div className="hidden sm:block">
                   <h1 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
                     JIBCA
                   </h1>
@@ -77,13 +79,17 @@ const Layout = ({ children }) => {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative ${
                       isActive(item.href)
                         ? 'bg-blue-50 text-blue-700 shadow-sm'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >
-                    <IconComponent className="w-4 h-4" />
+                    {item.badge ? (
+                      <NotificationBadge />
+                    ) : (
+                      <IconComponent className="w-4 h-4" />
+                    )}
                     <span>{item.name}</span>
                   </Link>
                 )
@@ -102,7 +108,7 @@ const Layout = ({ children }) => {
                 className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 <LogOut className="w-4 h-4" />
-                <span>Sair</span>
+                <span className="hidden sm:inline">Sair</span>
               </button>
 
               {/* Botão Menu Mobile */}
@@ -120,7 +126,7 @@ const Layout = ({ children }) => {
           </div>
         </div>
 
-        {/* Menu Mobile */}
+        {/* Menu Mobile Expandido */}
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 bg-white shadow-lg">
             <div className="px-2 pt-2 pb-3 space-y-1">
@@ -131,13 +137,17 @@ const Layout = ({ children }) => {
                     key={item.name}
                     to={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
+                    className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-base font-medium transition-all duration-200 mobile-nav-item ${
                       isActive(item.href)
                         ? 'bg-blue-50 text-blue-700'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >
-                    <IconComponent className="w-5 h-5" />
+                    {item.badge ? (
+                      <NotificationBadge />
+                    ) : (
+                      <IconComponent className="w-5 h-5" />
+                    )}
                     <span>{item.name}</span>
                   </Link>
                 )
@@ -152,13 +162,16 @@ const Layout = ({ children }) => {
       </header>
 
       {/* Conteúdo Principal */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto container-responsive py-4 sm:py-6 lg:py-8 full-height-mobile">
         {children}
       </main>
 
+      {/* Navegação Mobile Fixa */}
+      <MobileNavigation />
+
       {/* Rodapé Corporativo */}
-      <footer className="bg-white border-t border-gray-200 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <footer className="bg-white border-t border-gray-200 mt-auto mb-16 md:mb-0">
+        <div className="max-w-7xl mx-auto container-responsive py-6">
           <div className="text-center text-sm text-gray-500">
             <p>© 2026 JIBCA - Juventude da Igreja Batista. Sistema desenvolvido com excelência técnica.</p>
           </div>
