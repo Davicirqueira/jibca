@@ -40,8 +40,9 @@ const DashboardPage = () => {
       description: 'Acompanhe comunicações e lembretes importantes',
       href: '/notifications',
       icon: Bell,
-      color: 'bg-yellow-600',
-      hoverColor: 'hover:bg-yellow-700'
+      color: 'bg-red-900',
+      hoverColor: 'hover:bg-red-800',
+      priority: true
     },
     ...(isLeader() ? [{
       title: 'Administração de Membros',
@@ -64,17 +65,20 @@ const DashboardPage = () => {
   return (
     <div className="space-y-8">
       {/* Seção de Boas-vindas Corporativa */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 rounded-2xl text-white p-8 shadow-2xl">
+      <div className="rounded-2xl text-white p-8 shadow-2xl border border-gray-800" style={{ backgroundColor: '#8B0000' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
-              <Activity className="w-8 h-8 text-white" />
+            {/* Avatar do Usuário */}
+            <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border-2 border-white/30">
+              <span className="text-lg font-bold text-white">
+                {user?.name?.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2) || 'U'}
+              </span>
             </div>
             <div>
-              <h1 className="text-4xl font-bold mb-2">
+              <h1 className="text-3xl font-bold mb-2 animate-fade-in" style={{ letterSpacing: '-0.5px' }}>
                 Bem-vindo, {user?.name}
               </h1>
-              <p className="text-slate-200 text-lg font-medium">
+              <p className="text-white text-lg font-medium opacity-90">
                 {isLeader() 
                   ? 'Painel de controle administrativo - Acesso completo ao sistema' 
                   : 'Portal do participante - Acompanhe eventos e atividades da juventude'
@@ -84,8 +88,10 @@ const DashboardPage = () => {
           </div>
           <div className="hidden lg:block">
             <div className="text-right">
-              <p className="text-slate-300 text-sm font-medium">Função no Sistema</p>
-              <p className="text-white text-xl font-bold capitalize">{user?.role}</p>
+              <p className="text-white text-sm font-medium opacity-80">Função no Sistema</p>
+              <p className="text-white text-xl font-bold">
+                {user?.role === 'leader' ? 'Líder' : user?.role === 'member' ? 'Membro' : user?.role}
+              </p>
             </div>
           </div>
         </div>
@@ -108,21 +114,35 @@ const DashboardPage = () => {
                 key={index}
                 to={action.href}
                 className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1"
+                style={{
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  '--hover-shadow': '0 8px 24px rgba(0,0,0,0.12)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'
+                }}
               >
                 <div className="flex items-start space-x-4">
-                  <div className={`${action.color} ${action.hoverColor} text-white p-4 rounded-xl transition-all duration-200 group-hover:scale-110`}>
+                  <div className={`${action.color} ${action.hoverColor} text-white p-4 rounded-xl transition-all duration-200 group-hover:scale-110 shadow-sm`}
+                       style={{ width: '56px', height: '56px' }}>
                     <IconComponent className="w-6 h-6" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
                       {action.title}
                     </h3>
-                    <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                    <p className="text-gray-600 text-sm leading-relaxed mb-4">
                       {action.description}
                     </p>
-                    <div className="flex items-center text-blue-600 text-sm font-medium group-hover:text-blue-700">
+                    <div className="flex items-center text-sm font-medium transition-colors duration-200"
+                         style={{ color: action.priority ? '#8B0000' : '#3b82f6' }}
+                         onMouseEnter={(e) => e.target.style.color = action.priority ? '#A52A2A' : '#2563eb'}
+                         onMouseLeave={(e) => e.target.style.color = action.priority ? '#8B0000' : '#3b82f6'}>
                       <span>Acessar módulo</span>
-                      <ArrowRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform duration-200" />
                     </div>
                   </div>
                 </div>

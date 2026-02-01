@@ -51,17 +51,17 @@ const Layout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50 pb-16 md:pb-0">
       {/* Header Corporativo */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo Corporativo */}
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-3 group">
-                <div className="p-2 bg-blue-600 rounded-lg group-hover:bg-blue-700 transition-colors duration-200">
+                <div className="p-2 bg-blue-600 rounded-xl group-hover:bg-blue-700 transition-all duration-200 shadow-sm">
                   <Church className="w-6 h-6 text-white" />
                 </div>
                 <div className="hidden sm:block">
-                  <h1 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                  <h1 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
                     JIBCA
                   </h1>
                   <p className="text-xs text-gray-500 font-medium">
@@ -72,18 +72,23 @@ const Layout = ({ children }) => {
             </div>
 
             {/* Navegação Desktop */}
-            <nav className="hidden md:flex space-x-1">
+            <nav className="hidden md:flex items-center space-x-1">
               {navigation.map((item) => {
                 const IconComponent = item.icon
+                const active = isActive(item.href)
                 return (
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative ${
-                      isActive(item.href)
-                        ? 'bg-blue-50 text-blue-700 shadow-sm'
+                    className={`flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 relative ${
+                      active
+                        ? 'text-white font-semibold'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
+                    style={active ? {
+                      backgroundColor: '#8B0000',
+                      borderBottom: '3px solid #6B0000'
+                    } : {}}
                   >
                     {item.badge ? (
                       <NotificationBadge />
@@ -100,12 +105,17 @@ const Layout = ({ children }) => {
             <div className="flex items-center space-x-4">
               <div className="hidden md:block text-right">
                 <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                <p className="text-xs text-gray-500 capitalize font-medium">{user?.role}</p>
+                <p className="text-xs text-gray-500 capitalize font-medium">
+                  {user?.role === 'leader' ? 'Líder' : user?.role === 'member' ? 'Membro' : user?.role}
+                </p>
               </div>
               
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105"
+                className="flex items-center space-x-2 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105"
+                style={{ backgroundColor: '#8B0000' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#A52A2A'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#8B0000'}
               >
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline">Sair</span>
@@ -155,7 +165,9 @@ const Layout = ({ children }) => {
             </div>
             <div className="border-t border-gray-200 px-4 py-3">
               <p className="text-base font-medium text-gray-900">{user?.name}</p>
-              <p className="text-sm text-gray-500 capitalize">{user?.role}</p>
+              <p className="text-sm text-gray-500 capitalize">
+                {user?.role === 'leader' ? 'Líder' : user?.role === 'member' ? 'Membro' : user?.role}
+              </p>
             </div>
           </div>
         )}
@@ -170,10 +182,10 @@ const Layout = ({ children }) => {
       <MobileNavigation />
 
       {/* Rodapé Corporativo */}
-      <footer className="bg-white border-t border-gray-200 mt-auto mb-16 md:mb-0">
+      <footer className="bg-gray-50 border-t border-gray-200 mt-auto mb-16 md:mb-0">
         <div className="max-w-7xl mx-auto container-responsive py-6">
-          <div className="text-center text-sm text-gray-500">
-            <p>© 2026 JIBCA - Juventude da Igreja Batista. Sistema desenvolvido com excelência técnica.</p>
+          <div className="text-center text-sm text-gray-600">
+            <p>© 2026 JIBCA - Juventude da Igreja Batista Castro Alves</p>
           </div>
         </div>
       </footer>

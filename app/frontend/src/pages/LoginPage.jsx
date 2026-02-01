@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { Church, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
+import { Church, Eye, EyeOff, AlertCircle } from 'lucide-react'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
@@ -66,27 +66,36 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header Corporativo */}
-        <div className="text-center">
-          <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <Church className="w-10 h-10 text-white" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        {/* Card Principal */}
+        <div className="bg-white rounded-2xl p-10 border border-gray-100" style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.12)' }}>
+          {/* Header do Card */}
+          <div className="text-center mb-8">
+            {/* Logo JIBCA */}
+            <div className="w-14 h-14 mx-auto mb-6 rounded-xl flex items-center justify-center"
+                 style={{ backgroundColor: 'rgba(139,0,0,0.1)' }}>
+              <Church className="w-8 h-8" style={{ color: '#8B0000' }} />
+            </div>
+            
+            {/* Títulos */}
+            <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ letterSpacing: '-0.5px' }}>
+              Agenda JIBCA
+            </h1>
+            <p className="text-gray-600 text-lg mb-3">
+              Calendário da Juventude
+            </p>
+            
+            {/* Separador */}
+            <div className="border-t border-gray-100 pt-3 mt-3">
+              <p className="text-gray-500 text-sm">
+                Acesso restrito a membros autorizados
+              </p>
+            </div>
           </div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-3">
-            JIBCA Sistema
-          </h2>
-          <p className="text-gray-600 text-lg font-medium">
-            Plataforma de Gestão da Juventude
-          </p>
-          <p className="text-gray-500 text-sm mt-2">
-            Acesso restrito a membros autorizados
-          </p>
-        </div>
 
-        {/* Formulário de Login */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          {/* Formulário */}
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Erro geral */}
             {errors.general && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center space-x-3">
@@ -97,25 +106,30 @@ const LoginPage = () => {
 
             {/* Campo Email */}
             <div>
-              <label htmlFor="email" className="label">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Endereço de Email
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={`input-field pl-10 ${errors.email ? 'border-red-300 focus:ring-red-500' : ''}`}
-                  placeholder="seu.email@exemplo.com"
-                />
-              </div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="seu-email@exemplo.com"
+                className="w-full h-12 px-4 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 transition-all duration-200 focus:outline-none"
+                style={{
+                  fontSize: '15px',
+                  borderWidth: '1.5px'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#8B0000'
+                  e.target.style.boxShadow = '0 0 0 3px rgba(139,0,0,0.1)'
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e5e7eb'
+                  e.target.style.boxShadow = 'none'
+                }}
+                disabled={isLoading}
+                required
+              />
               {errors.email && (
                 <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
                   <AlertCircle className="w-4 h-4" />
@@ -126,86 +140,101 @@ const LoginPage = () => {
 
             {/* Campo Senha */}
             <div>
-              <label htmlFor="password" className="label">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Senha de Acesso
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
                 <input
-                  id="password"
-                  name="password"
                   type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`input-field pl-10 pr-10 ${errors.password ? 'border-red-300 focus:ring-red-500' : ''}`}
                   placeholder="Digite sua senha"
+                  className="w-full h-12 px-4 pr-12 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 transition-all duration-200 focus:outline-none"
+                  style={{
+                    fontSize: '15px',
+                    borderWidth: '1.5px'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#8B0000'
+                    e.target.style.boxShadow = '0 0 0 3px rgba(139,0,0,0.1)'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb'
+                    e.target.style.boxShadow = 'none'
+                  }}
+                  disabled={isLoading}
+                  required
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                  disabled={isLoading}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  )}
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
+              
               {errors.password && (
                 <p className="mt-2 text-sm text-red-600 flex items-center space-x-1">
                   <AlertCircle className="w-4 h-4" />
                   <span>{errors.password}</span>
                 </p>
               )}
+              
+              {/* Link Esqueceu Senha */}
+              <div className="text-right mt-2">
+                <button
+                  type="button"
+                  className="text-sm font-medium hover:underline transition-colors duration-200"
+                  style={{ color: '#8B0000' }}
+                >
+                  Esqueceu a senha?
+                </button>
+              </div>
             </div>
 
-            {/* Botão de Submit */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center py-4 text-lg font-semibold"
-            >
-              {isLoading ? (
-                <>
-                  <LoadingSpinner size="small" className="mr-3" />
-                  Autenticando...
-                </>
-              ) : (
-                'Acessar Sistema'
-              )}
-            </button>
+            {/* Botão de Login */}
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-12 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                style={{
+                  backgroundColor: '#8B0000',
+                  letterSpacing: '0.3px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isLoading) e.target.style.backgroundColor = '#A52A2A'
+                }}
+                onMouseLeave={(e) => {
+                  if (!isLoading) e.target.style.backgroundColor = '#8B0000'
+                }}
+                onMouseDown={(e) => {
+                  if (!isLoading) e.target.style.backgroundColor = '#6B0000'
+                }}
+                onMouseUp={(e) => {
+                  if (!isLoading) e.target.style.backgroundColor = '#A52A2A'
+                }}
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <LoadingSpinner size="small" />
+                    <span>Acessando...</span>
+                  </div>
+                ) : (
+                  'Acessar Sistema'
+                )}
+              </button>
+            </div>
           </form>
 
-          {/* Credenciais de Demonstração */}
-          <div className="mt-8 p-6 bg-gray-50 rounded-2xl border border-gray-200">
-            <h3 className="text-sm font-bold text-gray-800 mb-3">
-              Credenciais de Demonstração:
-            </h3>
-            <div className="space-y-2 text-xs text-gray-600">
-              <div className="flex justify-between items-center p-2 bg-white rounded-lg">
-                <span className="font-medium">Administrador:</span>
-                <span className="font-mono">chris@jibca.org</span>
-              </div>
-              <div className="flex justify-between items-center p-2 bg-white rounded-lg">
-                <span className="font-medium">Participante:</span>
-                <span className="font-mono">joao@exemplo.com</span>
-              </div>
-              <div className="text-center mt-3 p-2 bg-blue-50 rounded-lg">
-                <span className="font-medium text-blue-700">Senha padrão: jibca2024</span>
-              </div>
-            </div>
+          {/* Footer do Card */}
+          <div className="border-t border-gray-100 pt-6 mt-8">
+            <p className="text-center text-sm text-gray-500">
+              © 2026 JIBCA - Juventude da Igreja Batista Castro Alves
+            </p>
           </div>
-        </div>
-
-        {/* Rodapé Corporativo */}
-        <div className="text-center text-sm text-gray-500">
-          <p className="font-medium">© 2026 JIBCA - Juventude da Igreja Batista</p>
-          <p className="mt-1">Sistema desenvolvido com excelência técnica</p>
         </div>
       </div>
     </div>

@@ -59,5 +59,15 @@ export const userService = {
     } catch (error) {
       throw error
     }
+  },
+
+  // Atualizar perfil do usuário logado
+  async updateProfile(userData) {
+    try {
+      const response = await api.put('/auth/profile', userData)
+      return response.data.data.user
+    } catch (error) {
+      throw error
+    }
   }
 }

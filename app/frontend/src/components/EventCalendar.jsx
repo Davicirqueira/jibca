@@ -63,6 +63,7 @@ const EventCalendar = ({ onEventClick, showCreateButton = false, onCreateEvent }
       'Estudo Bíblico': 'bg-purple-600 border-purple-700',
       'Confraternização': 'bg-red-600 border-red-700',
       'Evangelismo': 'bg-cyan-600 border-cyan-700',
+      'Passeio': 'bg-emerald-600 border-emerald-700',
     }
     return colors[eventTypeName] || 'bg-gray-600 border-gray-700'
   }
@@ -90,7 +91,7 @@ const EventCalendar = ({ onEventClick, showCreateButton = false, onCreateEvent }
   return (
     <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
       {/* Header Corporativo */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white p-6">
+      <div className="text-white p-6" style={{ background: 'linear-gradient(135deg, #8B0000 0%, #6B0000 100%)' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
@@ -100,7 +101,7 @@ const EventCalendar = ({ onEventClick, showCreateButton = false, onCreateEvent }
               <h2 className="text-3xl font-bold">
                 {format(currentDate, 'MMMM yyyy', { locale: ptBR })}
               </h2>
-              <p className="text-slate-200 text-sm font-medium">
+              <p className="text-white text-sm font-medium opacity-80">
                 Sistema de Gestão de Eventos JIBCA
               </p>
             </div>
@@ -175,10 +176,11 @@ const EventCalendar = ({ onEventClick, showCreateButton = false, onCreateEvent }
                   className={`
                     min-h-[120px] p-3 border border-gray-100 rounded-xl cursor-pointer transition-all duration-200 transform hover:scale-[1.02]
                     ${isCurrentMonth ? 'bg-white' : 'bg-gray-50/50'}
-                    ${isDayToday ? 'ring-2 ring-blue-500 bg-blue-50' : ''}
+                    ${isDayToday ? 'ring-2 bg-red-50' : ''}
                     ${isSelected ? 'ring-2 ring-purple-500 bg-purple-50' : ''}
                     ${isHovered ? 'shadow-lg bg-gray-50' : 'hover:shadow-md'}
                   `}
+                  style={isDayToday ? { ringColor: '#8B0000' } : isHovered ? { backgroundColor: 'rgba(139,0,0,0.03)' } : {}}
                   onClick={() => setSelectedDate(day)}
                   onMouseEnter={() => setHoveredDate(day)}
                   onMouseLeave={() => setHoveredDate(null)}
@@ -186,8 +188,9 @@ const EventCalendar = ({ onEventClick, showCreateButton = false, onCreateEvent }
                   {/* Número do dia */}
                   <div className={`
                     text-sm font-bold mb-2 flex items-center justify-center w-7 h-7 rounded-full
-                    ${isDayToday ? 'bg-blue-600 text-white' : isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}
-                  `}>
+                    ${isDayToday ? 'text-white font-bold' : isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}
+                  `}
+                  style={isDayToday ? { backgroundColor: '#8B0000' } : {}}>
                     {format(day, 'd')}
                   </div>
 
@@ -240,6 +243,7 @@ const EventCalendar = ({ onEventClick, showCreateButton = false, onCreateEvent }
                 { name: 'Estudo Bíblico', color: 'bg-purple-600' },
                 { name: 'Confraternização', color: 'bg-red-600' },
                 { name: 'Evangelismo', color: 'bg-cyan-600' },
+                { name: 'Passeio', color: 'bg-emerald-600' },
               ].map((type) => (
                 <div key={type.name} className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
                   <div className={`w-3 h-3 rounded-full ${type.color}`}></div>

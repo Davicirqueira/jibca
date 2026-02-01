@@ -104,6 +104,7 @@ const EventDetails = () => {
       'Estudo Bíblico': 'bg-purple-600 border-purple-700',
       'Confraternização': 'bg-red-600 border-red-700',
       'Evangelismo': 'bg-cyan-600 border-cyan-700',
+      'Passeio': 'bg-emerald-600 border-emerald-700',
     }
     return colors[eventTypeName] || 'bg-gray-600 border-gray-700'
   }

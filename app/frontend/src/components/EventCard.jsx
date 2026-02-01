@@ -15,6 +15,7 @@ const EventCard = ({ event, showConfirmationButton = true, onConfirm }) => {
       'Estudo Bíblico': 'bg-purple-500',
       'Confraternização': 'bg-red-500',
       'Evangelismo': 'bg-cyan-500',
+      'Passeio': 'bg-emerald-500',
     }
     return colors[eventTypeName] || 'bg-gray-500'
   }
