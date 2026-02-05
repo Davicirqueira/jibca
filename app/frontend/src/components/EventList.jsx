@@ -73,7 +73,7 @@ const EventList = ({
     };
 
     try {
-      const result = await execute(asyncOperation, {
+      await execute(asyncOperation, {
         emptyCheck: (data) => !data?.events || data.events.length === 0,
         showToastOnError: true,
         onSuccess: (data) => {
@@ -90,11 +90,9 @@ const EventList = ({
           setPagination({});
         }
       });
-
-      return result;
     } catch (error) {
-      // Erro já tratado pelo hook
-      return null;
+      // Erro já tratado pelo hook, não fazer nada
+      // Se foi abortado, o hook já tratou silenciosamente
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, selectedType, futureOnly, JSON.stringify(filters)]);

@@ -65,6 +65,16 @@ export const userService = {
     }
   },
 
+  // Reativar usuário (apenas líder)
+  async reactivateUser(id) {
+    try {
+      const response = await api.patch(`/users/${id}/reactivate`)
+      return response.data.data.user
+    } catch (error) {
+      throw error
+    }
+  },
+
   // Obter estatísticas de usuários (apenas líder)
   async getUserStats() {
     try {

@@ -216,8 +216,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
         name: formData.name.trim(),
         email: formData.email.trim().toLowerCase(),
         phone: formData.phone.trim() || null,
-        role: formData.role,
-        active: formData.active
+        role: formData.role
       }
 
       // Incluir senha apenas se fornecida
@@ -227,8 +226,26 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
 
       let result
       if (memberId) {
+        // Atualizar dados do membro
         result = await userService.updateUser(memberId, memberData)
-        toastManager.success('Membro atualizado com sucesso!')
+        
+        // Verificar se o status ativo mudou e fazer chamada separada
+        const currentMember = await userService.getUserById(memberId)
+        const currentActive = currentMember.active !== false && currentMember.active !== 0
+        
+        if (currentActive !== formData.active) {
+          if (formData.active) {
+            // Reativar membro
+            await userService.reactivateUser(memberId)
+            toastManager.success('Membro atualizado e reativado com sucesso!')
+          } else {
+            // Desativar membro
+            await userService.deactivateUser(memberId)
+            toastManager.success('Membro atualizado e desativado com sucesso!')
+          }
+        } else {
+          toastManager.success('Membro atualizado com sucesso!')
+        }
       } else {
         result = await userService.createUser(memberData)
         toastManager.success(`Membro criado com sucesso! Senha inicial: ${generatedPassword}`)
@@ -242,13 +259,16 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
     } catch (error) {
       console.error('Erro ao salvar membro:', error)
       
-      if (error.response?.data?.message) {
-        if (error.response.data.message.includes('email')) {
+      if (error.response?.data?.error?.message) {
+        const errorMsg = error.response.data.error.message
+        if (errorMsg.includes('email') || errorMsg.includes('Email')) {
           setErrors({ email: 'Este email já está em uso' })
           toastManager.error('Email já está em uso por outro membro')
         } else {
-          toastManager.error(error.response.data.message)
+          toastManager.error(errorMsg)
         }
+      } else if (error.response?.data?.message) {
+        toastManager.error(error.response.data.message)
       } else {
         toastManager.error(memberId ? 'Erro ao atualizar membro' : 'Erro ao criar membro')
       }

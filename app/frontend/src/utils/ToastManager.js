@@ -32,18 +32,34 @@ class ToastManager {
 
     const defaultOptions = {
       duration: type === 'error' ? 6000 : 4000,
-      onClose: () => {
-        this.activeToasts.delete(message);
-        this.toastIds.delete(message);
-      },
       ...options
     };
 
-    // Mostrar toast usando react-hot-toast
-    const toastId = toast[type](message, defaultOptions);
+    let toastId;
+
+    // Mostrar toast usando react-hot-toast com método correto
+    switch (type) {
+      case 'success':
+        toastId = toast.success(message, defaultOptions);
+        break;
+      case 'error':
+        toastId = toast.error(message, defaultOptions);
+        break;
+      case 'loading':
+        toastId = toast.loading(message, defaultOptions);
+        break;
+      default:
+        toastId = toast(message, defaultOptions);
+    }
     
     // Armazenar ID do toast
     this.toastIds.set(message, toastId);
+
+    // Configurar callback de limpeza
+    setTimeout(() => {
+      this.activeToasts.delete(message);
+      this.toastIds.delete(message);
+    }, defaultOptions.duration);
 
     return toastId;
   }

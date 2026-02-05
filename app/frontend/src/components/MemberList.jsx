@@ -114,16 +114,20 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
   const handleToggleMemberStatus = async (memberId, newStatus) => {
     try {
       if (newStatus) {
-        // Reativar membro (implementar quando necessário)
-        toastManager.info('Funcionalidade de reativação será implementada')
+        // Reativar membro
+        await userService.reactivateUser(memberId)
+        toastManager.success('Membro reativado com sucesso!')
+        loadMembers() // Recarregar lista
       } else {
+        // Desativar membro
         await userService.deactivateUser(memberId)
         toastManager.success('Membro desativado com sucesso!')
         loadMembers() // Recarregar lista
       }
     } catch (error) {
       console.error('Erro ao alterar status do membro:', error)
-      toastManager.error('Erro ao alterar status do membro')
+      const errorMessage = error.response?.data?.error?.message || 'Erro ao alterar status do membro'
+      toastManager.error(errorMessage)
     }
   }
 

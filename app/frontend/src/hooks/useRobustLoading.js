@@ -108,11 +108,16 @@ export const useRobustLoading = (timeout = 10000) => {
         timeoutRef.current = null;
       }
 
+      // Se foi abortado intencionalmente (componente desmontado ou nova requisição), não tratar como erro
+      if (error.name === 'AbortError' || error.message === 'ABORTED') {
+        console.log('Requisição abortada (timeout ou nova requisição)');
+        setLoadingState(LoadingState.IDLE);
+        return null;
+      }
+
       let errorMsg = '';
 
-      if (error.name === 'AbortError' || error.message === 'ABORTED') {
-        errorMsg = 'A requisição demorou muito. Verifique sua conexão.';
-      } else if (error.response?.status >= 500) {
+      if (error.response?.status >= 500) {
         errorMsg = 'Erro interno do servidor. Tente novamente.';
       } else if (error.response?.status === 404) {
         errorMsg = 'Recurso não encontrado.';
@@ -128,7 +133,7 @@ export const useRobustLoading = (timeout = 10000) => {
       setErrorMessage(errorMsg);
 
       // Mostrar toast de erro se habilitado
-      if (showToastOnError && !signal.aborted) {
+      if (showToastOnError) {
         toastManager.error(errorMsg);
       }
 
