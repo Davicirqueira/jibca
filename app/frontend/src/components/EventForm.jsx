@@ -129,8 +129,7 @@ const EventForm = ({ eventId = null, onClose = null, onSuccess = null }) => {
       ...data,
       title: data.title.trim(),
       description: data.description?.trim() || '',
-      location: data.location?.trim() || '',
-      event_type_id: parseInt(data.event_type_id)
+      location: data.location?.trim() || ''
     }
 
     if (eventId) {
@@ -265,6 +264,7 @@ const EventForm = ({ eventId = null, onClose = null, onSuccess = null }) => {
               isValid={isFieldValid('event_type_id')}
               required
               disabled={isSubmitting}
+              valueAsNumber={true}
             />
           </div>
 

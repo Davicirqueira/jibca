@@ -14,6 +14,7 @@ const FormSelect = ({
   isValid,
   required = false,
   disabled = false,
+  valueAsNumber = false,
   className = '',
   ...props
 }) => {
@@ -65,7 +66,7 @@ const FormSelect = ({
         <select
           disabled={disabled}
           className={getSelectClasses()}
-          {...register(name)}
+          {...register(name, { valueAsNumber })}
           {...props}
         >
           <option value="">{placeholder}</option>
