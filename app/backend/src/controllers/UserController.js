@@ -256,7 +256,7 @@ class UserController {
       }
 
       // Verificar se email já existe (se está sendo alterado)
-      if (updateData.email && updateData.email !== existingUser.email) {
+      if (updateData.email && updateData.email.toLowerCase() !== existingUser.email.toLowerCase()) {
         const emailExists = await UserRepository.emailExists(updateData.email, userId);
         if (emailExists) {
           return res.status(409).json({
@@ -272,10 +272,34 @@ class UserController {
       // Limpar dados de entrada
       const cleanUpdateData = {};
       if (updateData.name) cleanUpdateData.name = updateData.name.trim();
-      if (updateData.email) cleanUpdateData.email = updateData.email.toLowerCase();
-      if (updateData.phone) cleanUpdateData.phone = updateData.phone.trim();
+      if (updateData.email) cleanUpdateData.email = updateData.email.toLowerCase().trim();
+      if (updateData.phone !== undefined) cleanUpdateData.phone = updateData.phone ? updateData.phone.trim() : null;
+      if (updateData.role && ['leader', 'member'].includes(updateData.role)) {
+        cleanUpdateData.role = updateData.role;
+      }
+
+      // Verificar se há campos para atualizar
+      if (Object.keys(cleanUpdateData).length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'NO_FIELDS_TO_UPDATE',
+            message: 'Nenhum campo válido para atualização'
+          }
+        });
+      }
 
       const updatedUser = await UserRepository.update(userId, cleanUpdateData);
+
+      if (!updatedUser) {
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'UPDATE_FAILED',
+            message: 'Falha ao atualizar usuário'
+          }
+        });
+      }
 
       res.json({
         success: true,
@@ -303,7 +327,8 @@ class UserController {
         success: false,
         error: {
           code: 'UPDATE_USER_ERROR',
-          message: 'Erro interno ao atualizar usuário'
+          message: 'Erro interno ao atualizar usuário',
+          detail: process.env.NODE_ENV === 'development' ? error.message : undefined
         }
       });
     }
@@ -376,6 +401,186 @@ class UserController {
         error: {
           code: 'DEACTIVATE_USER_ERROR',
           message: 'Erro interno ao desativar usuário'
+        }
+      });
+    }
+  }
+
+  /**
+   * Reativar membro
+   * PATCH /api/v1/users/:id/reactivate
+   */
+  static async reactivate(req, res) {
+    try {
+      const { id } = req.params;
+
+      if (!id || isNaN(parseInt(id))) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_ID',
+            message: 'ID do usuário deve ser um número válido'
+          }
+        });
+      }
+
+      const userId = parseInt(id);
+
+      // Buscar usuário
+      const user = await UserRepository.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          error: {
+            code: 'USER_NOT_FOUND',
+            message: 'Usuário não encontrado'
+          }
+        });
+      }
+
+      // Verificar se já está ativo
+      if (user.is_active) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'USER_ALREADY_ACTIVE',
+            message: 'Usuário já está ativo'
+          }
+        });
+      }
+
+      // Reativar usuário
+      const reactivatedUser = await UserRepository.reactivate(userId);
+
+      if (!reactivatedUser) {
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'REACTIVATION_FAILED',
+            message: 'Falha ao reativar usuário'
+          }
+        });
+      }
+
+      console.log(`✅ Usuário reativado: ${reactivatedUser.email} (ID: ${userId})`);
+
+      res.json({
+        success: true,
+        data: {
+          user: {
+            id: reactivatedUser.id,
+            name: reactivatedUser.name,
+            email: reactivatedUser.email,
+            role: reactivatedUser.role,
+            phone: reactivatedUser.phone,
+            avatar_url: reactivatedUser.avatar_url,
+            active: reactivatedUser.is_active,
+            is_active: reactivatedUser.is_active,
+            created_at: reactivatedUser.created_at,
+            updated_at: reactivatedUser.updated_at
+          }
+        },
+        message: 'Usuário reativado com sucesso'
+      });
+
+    } catch (error) {
+      console.error('❌ Erro ao reativar usuário:', error);
+      
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'REACTIVATE_USER_ERROR',
+          message: 'Erro interno ao reativar usuário'
+        }
+      });
+    }
+  }
+
+  /**
+   * Excluir membro permanentemente
+   * DELETE /api/v1/users/:id/permanent
+   */
+  static async permanentDelete(req, res) {
+    try {
+      const { id } = req.params;
+
+      if (!id || isNaN(parseInt(id))) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_ID',
+            message: 'ID do usuário deve ser um número válido'
+          }
+        });
+      }
+
+      const userId = parseInt(id);
+
+      // Verificar se usuário existe
+      const user = await UserRepository.findById(userId);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          error: {
+            code: 'USER_NOT_FOUND',
+            message: 'Usuário não encontrado'
+          }
+        });
+      }
+
+      // Verificar se não é o próprio usuário logado
+      if (userId === req.user.id) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'CANNOT_DELETE_SELF',
+            message: 'Você não pode excluir sua própria conta'
+          }
+        });
+      }
+
+      // Verificar se usuário tem eventos criados
+      const EventRepository = require('../repositories/EventRepository');
+      const hasEvents = await EventRepository.countByCreator(userId);
+      if (hasEvents > 0) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'USER_HAS_EVENTS',
+            message: 'Não é possível excluir usuário que criou eventos. Desative-o ao invés disso.'
+          }
+        });
+      }
+
+      // Excluir permanentemente
+      const deleted = await UserRepository.permanentDelete(userId);
+
+      if (!deleted) {
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'DELETE_FAILED',
+            message: 'Falha ao excluir usuário'
+          }
+        });
+      }
+
+      console.log(`✅ Usuário excluído permanentemente: ${user.email} (ID: ${userId})`);
+
+      res.json({
+        success: true,
+        message: 'Usuário excluído permanentemente'
+      });
+
+    } catch (error) {
+      console.error('❌ Erro ao excluir usuário permanentemente:', error);
+      
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'PERMANENT_DELETE_ERROR',
+          message: 'Erro interno ao excluir usuário'
         }
       });
     }

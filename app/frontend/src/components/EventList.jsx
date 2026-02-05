@@ -96,7 +96,8 @@ const EventList = ({
       // Erro já tratado pelo hook
       return null;
     }
-  }, [currentPage, selectedType, futureOnly, filters, execute]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, selectedType, futureOnly, JSON.stringify(filters)]);
 
   // Carregar eventos quando dependências mudarem
   useEffect(() => {

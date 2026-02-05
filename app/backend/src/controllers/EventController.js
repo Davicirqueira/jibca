@@ -37,6 +37,20 @@ class EventController {
         duration_minutes
       } = req.body;
 
+      // CRÍTICO: Converter event_type_id para integer
+      const eventTypeId = parseInt(event_type_id);
+      
+      // Validação: Verificar se event_type_id é válido
+      if (!eventTypeId || isNaN(eventTypeId)) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_EVENT_TYPE',
+            message: 'Tipo de evento inválido'
+          }
+        });
+      }
+
       // Verificar se a data não é no passado
       const eventDate = new Date(date);
       const today = new Date();
@@ -54,14 +68,14 @@ class EventController {
 
       // Verificar se o tipo de evento existe
       const eventTypes = await EventRepository.getEventTypes();
-      const validType = eventTypes.find(type => type.id === event_type_id);
+      const validType = eventTypes.find(type => type.id === eventTypeId);
       
       if (!validType) {
         return res.status(400).json({
           success: false,
           error: {
             code: 'INVALID_EVENT_TYPE',
-            message: 'Tipo de evento inválido'
+            message: 'Tipo de evento não encontrado'
           }
         });
       }
@@ -80,7 +94,7 @@ class EventController {
       const eventData = {
         title: title.trim(),
         description: description?.trim(),
-        event_type_id,
+        event_type_id: eventTypeId, // CRÍTICO: Usar o valor convertido
         date,
         time,
         location: location?.trim(),
@@ -156,22 +170,43 @@ class EventController {
 
       const result = await EventRepository.list(options);
 
+      // CRÍTICO: Sempre retornar array, mesmo vazio
       res.json({
         success: true,
         data: {
-          events: result.events,
-          pagination: result.pagination
-        }
+          events: result.events || [],
+          pagination: result.pagination || {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false
+          }
+        },
+        total: result.events ? result.events.length : 0
       });
 
     } catch (error) {
       console.error('Erro ao listar eventos:', error);
       
+      // CRÍTICO: Mesmo em erro, retornar estrutura consistente
       res.status(500).json({
         success: false,
         error: {
           code: 'LIST_EVENTS_ERROR',
           message: 'Erro interno ao listar eventos'
+        },
+        data: {
+          events: [],
+          pagination: {
+            page: 1,
+            limit: 20,
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false
+          }
         }
       });
     }

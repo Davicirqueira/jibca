@@ -66,5 +66,7 @@ router.get('/', auth, requireRole('leader'), listValidation, UserController.list
 router.get('/:id', auth, requireRole('leader'), UserController.getById);
 router.put('/:id', auth, requireRole('leader'), updateUserValidation, UserController.update);
 router.delete('/:id', auth, requireLeaderForDeactivation, UserController.deactivate);
+router.patch('/:id/reactivate', auth, requireRole('leader'), UserController.reactivate);
+router.delete('/:id/permanent', auth, requireRole('leader'), UserController.permanentDelete);
 
 module.exports = router;

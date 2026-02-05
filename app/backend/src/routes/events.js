@@ -10,6 +10,7 @@ const router = express.Router();
 const createEventValidation = [
   body('title')
     .trim()
+    .notEmpty().withMessage('Título é obrigatório')
     .isLength({ min: 3, max: 200 })
     .withMessage('Título deve ter entre 3 e 200 caracteres'),
   body('description')
@@ -18,12 +19,16 @@ const createEventValidation = [
     .isLength({ max: 1000 })
     .withMessage('Descrição deve ter no máximo 1000 caracteres'),
   body('event_type_id')
+    .notEmpty().withMessage('Tipo de evento é obrigatório')
     .isInt({ min: 1 })
-    .withMessage('Tipo de evento deve ser válido'),
+    .withMessage('Tipo de evento deve ser um número válido')
+    .toInt(), // CRÍTICO: Converter para inteiro
   body('date')
+    .notEmpty().withMessage('Data é obrigatória')
     .isISO8601()
     .withMessage('Data deve ser válida no formato ISO 8601 (YYYY-MM-DD)'),
   body('time')
+    .notEmpty().withMessage('Horário é obrigatório')
     .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
     .withMessage('Horário deve estar no formato HH:MM'),
   body('location')

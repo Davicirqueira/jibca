@@ -318,6 +318,45 @@ class UserRepository {
     `);
     return parseInt(result.rows[0].count) || 0;
   }
+
+  /**
+   * Excluir usuário permanentemente (hard delete)
+   * @param {number} id - ID do usuário
+   * @returns {boolean} True se excluído com sucesso
+   */
+  static async permanentDelete(id) {
+    return await transaction(async (client) => {
+      try {
+        // 1. Excluir confirmações do usuário
+        await client.query('DELETE FROM confirmations WHERE user_id = $1', [id]);
+        
+        // 2. Excluir notificações do usuário
+        await client.query('DELETE FROM notifications WHERE user_id = $1', [id]);
+        
+        // 3. Excluir tokens de reset de senha (se a tabela existir)
+        try {
+          await client.query('DELETE FROM password_reset_tokens WHERE user_id = $1', [id]);
+        } catch (error) {
+          // Tabela pode não existir ainda, ignorar erro
+          console.log('Tabela password_reset_tokens não existe ainda');
+        }
+        
+        // 4. Excluir usuário
+        const result = await client.query('DELETE FROM users WHERE id = $1 RETURNING id, email', [id]);
+        
+        if (result.rowCount === 0) {
+          throw new Error('Usuário não encontrado');
+        }
+        
+        console.log(`Usuário excluído permanentemente: ${result.rows[0].email} (ID: ${id})`);
+        
+        return true;
+      } catch (error) {
+        console.error('Erro ao excluir usuário permanentemente:', error);
+        throw error;
+      }
+    });
+  }
 }
 
 module.exports = UserRepository;

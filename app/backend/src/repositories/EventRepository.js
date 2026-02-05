@@ -60,100 +60,117 @@ class EventRepository {
    * @returns {Object} Lista paginada de eventos
    */
   static async list(options = {}) {
-    const {
-      page = 1,
-      limit = 20,
-      event_type_id = null,
-      future_only = true,
-      search = '',
-      sort_by = 'date',
-      sort_order = 'ASC',
-      created_by = null
-    } = options;
+    try {
+      const {
+        page = 1,
+        limit = 20,
+        event_type_id = null,
+        future_only = true,
+        search = '',
+        sort_by = 'date',
+        sort_order = 'ASC',
+        created_by = null
+      } = options;
 
-    const offset = (page - 1) * limit;
-    let whereConditions = [];
-    let params = [];
-    let paramIndex = 1;
+      const offset = (page - 1) * limit;
+      let whereConditions = [];
+      let params = [];
+      let paramIndex = 1;
 
-    // Filtro para eventos futuros
-    if (future_only) {
-      whereConditions.push(`e.date >= CURRENT_DATE`);
-    }
-
-    // Filtro por tipo de evento
-    if (event_type_id) {
-      whereConditions.push(`e.event_type_id = $${paramIndex}`);
-      params.push(event_type_id);
-      paramIndex++;
-    }
-
-    // Filtro por criador
-    if (created_by) {
-      whereConditions.push(`e.created_by = $${paramIndex}`);
-      params.push(created_by);
-      paramIndex++;
-    }
-
-    // Filtro de busca por título ou descrição
-    if (search) {
-      whereConditions.push(`(e.title ILIKE $${paramIndex} OR e.description ILIKE $${paramIndex})`);
-      params.push(`%${search}%`);
-      paramIndex++;
-    }
-
-    const whereClause = whereConditions.length > 0 
-      ? `WHERE ${whereConditions.join(' AND ')}`
-      : '';
-
-    // Validar campos de ordenação
-    const validSortFields = ['date', 'time', 'title', 'created_at'];
-    const sortField = validSortFields.includes(sort_by) ? sort_by : 'date';
-    const sortDirection = sort_order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-
-    // Query principal
-    const eventsResult = await query(`
-      SELECT 
-        e.id, e.title, e.description, e.date, e.time, e.location, e.duration_minutes,
-        e.created_by, e.created_at, e.updated_at,
-        et.name as event_type_name, et.color as event_type_color, et.icon as event_type_icon,
-        u.name as created_by_name,
-        COUNT(c.id) as total_confirmations,
-        COUNT(CASE WHEN c.status = 'confirmed' THEN 1 END) as confirmed_count,
-        COUNT(CASE WHEN c.status = 'declined' THEN 1 END) as declined_count,
-        COUNT(CASE WHEN c.status = 'maybe' THEN 1 END) as maybe_count
-      FROM events e
-      LEFT JOIN event_types et ON e.event_type_id = et.id
-      LEFT JOIN users u ON e.created_by = u.id
-      LEFT JOIN confirmations c ON e.id = c.event_id
-      ${whereClause}
-      GROUP BY e.id, et.id, u.id
-      ORDER BY e.${sortField} ${sortDirection}, e.time ${sortDirection}
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-    `, [...params, limit, offset]);
-
-    // Query para contar total
-    const countResult = await query(`
-      SELECT COUNT(DISTINCT e.id) as total
-      FROM events e
-      LEFT JOIN event_types et ON e.event_type_id = et.id
-      ${whereClause}
-    `, params);
-
-    const total = parseInt(countResult.rows[0].total);
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      events: eventsResult.rows,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasNext: page < totalPages,
-        hasPrev: page > 1
+      // Filtro para eventos futuros
+      if (future_only) {
+        whereConditions.push(`e.date >= CURRENT_DATE`);
       }
-    };
+
+      // Filtro por tipo de evento
+      if (event_type_id) {
+        whereConditions.push(`e.event_type_id = $${paramIndex}`);
+        params.push(event_type_id);
+        paramIndex++;
+      }
+
+      // Filtro por criador
+      if (created_by) {
+        whereConditions.push(`e.created_by = $${paramIndex}`);
+        params.push(created_by);
+        paramIndex++;
+      }
+
+      // Filtro de busca por título ou descrição
+      if (search) {
+        whereConditions.push(`(e.title ILIKE $${paramIndex} OR e.description ILIKE $${paramIndex})`);
+        params.push(`%${search}%`);
+        paramIndex++;
+      }
+
+      const whereClause = whereConditions.length > 0 
+        ? `WHERE ${whereConditions.join(' AND ')}`
+        : '';
+
+      // Validar campos de ordenação
+      const validSortFields = ['date', 'time', 'title', 'created_at'];
+      const sortField = validSortFields.includes(sort_by) ? sort_by : 'date';
+      const sortDirection = sort_order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
+      // Query principal
+      const eventsResult = await query(`
+        SELECT 
+          e.id, e.title, e.description, e.date, e.time, e.location, e.duration_minutes,
+          e.created_by, e.created_at, e.updated_at,
+          et.name as event_type_name, et.color as event_type_color, et.icon as event_type_icon,
+          u.name as created_by_name,
+          COUNT(c.id) as total_confirmations,
+          COUNT(CASE WHEN c.status = 'confirmed' THEN 1 END) as confirmed_count,
+          COUNT(CASE WHEN c.status = 'declined' THEN 1 END) as declined_count,
+          COUNT(CASE WHEN c.status = 'maybe' THEN 1 END) as maybe_count
+        FROM events e
+        LEFT JOIN event_types et ON e.event_type_id = et.id
+        LEFT JOIN users u ON e.created_by = u.id
+        LEFT JOIN confirmations c ON e.id = c.event_id
+        ${whereClause}
+        GROUP BY e.id, et.id, u.id
+        ORDER BY e.${sortField} ${sortDirection}, e.time ${sortDirection}
+        LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+      `, [...params, limit, offset]);
+
+      // Query para contar total
+      const countResult = await query(`
+        SELECT COUNT(DISTINCT e.id) as total
+        FROM events e
+        LEFT JOIN event_types et ON e.event_type_id = et.id
+        ${whereClause}
+      `, params);
+
+      const total = parseInt(countResult.rows[0]?.total || 0);
+      const totalPages = Math.ceil(total / limit);
+
+      // CRÍTICO: Sempre retornar array, mesmo vazio
+      return {
+        events: eventsResult.rows || [],
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+          hasNext: page < totalPages,
+          hasPrev: page > 1
+        }
+      };
+    } catch (error) {
+      console.error('Erro no repository ao buscar eventos:', error);
+      // CRÍTICO: Em caso de erro, retornar array vazio ao invés de throw
+      return {
+        events: [],
+        pagination: {
+          page: 1,
+          limit: 20,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false
+        }
+      };
+    }
   }
 
   /**
@@ -177,7 +194,7 @@ class EventRepository {
       ORDER BY e.date, e.time
     `, [year, month]);
 
-    return result.rows;
+    return result.rows || [];
   }
 
   /**
@@ -243,7 +260,7 @@ class EventRepository {
       ORDER BY name
     `);
 
-    return result.rows;
+    return result.rows || [];
   }
 
   /**
@@ -278,7 +295,7 @@ class EventRepository {
       ORDER BY e.date, e.time
     `);
 
-    return result.rows;
+    return result.rows || [];
   }
 
   /**
@@ -375,8 +392,9 @@ class EventRepository {
       ${limitClause}
     `, params);
 
-    return result.rows;
+    return result.rows || [];
   }
+
   /**
    * Contar eventos futuros
    * @returns {number} Número de eventos futuros
@@ -387,7 +405,21 @@ class EventRepository {
       FROM events
       WHERE date >= CURRENT_DATE
     `);
-    return parseInt(result.rows[0].count) || 0;
+    return parseInt(result.rows[0]?.count || 0);
+  }
+
+  /**
+   * Contar eventos criados por um usuário
+   * @param {number} userId - ID do usuário
+   * @returns {number} Número de eventos criados
+   */
+  static async countByCreator(userId) {
+    const result = await query(`
+      SELECT COUNT(*) as count
+      FROM events
+      WHERE created_by = $1
+    `, [userId]);
+    return parseInt(result.rows[0]?.count || 0);
   }
 }
 

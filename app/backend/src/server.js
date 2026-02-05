@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const profileRoutes = require('./routes/profile');
 const eventRoutes = require('./routes/events');
 const confirmationRoutes = require('./routes/confirmations');
 const notificationRoutes = require('./routes/notifications');
@@ -27,6 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 // Rotas da API
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/profile', profileRoutes);
 app.use('/api/v1/events', eventRoutes);
 app.use('/api/v1/confirmations', confirmationRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
