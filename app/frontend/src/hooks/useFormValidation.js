@@ -1,159 +1,212 @@
-import { useState, useCallback } from 'react'
-import { debounce } from '../utils/validation'
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState, useCallback } from 'react';
+import { toastManager } from '../utils/ToastManager';
 
 /**
- * Hook personalizado para validação de formulários
- * @param {object} initialValues - Valores iniciais do formulário
- * @param {function} validationSchema - Função de validação
- * @param {object} options - Opções do hook
- * @returns {object} - Estado e funções do formulário
+ * Hook personalizado para gerenciar formulários com validação
+ * @param {object} schema - Schema de validação Zod
+ * @param {object} options - Opções adicionais
  */
-export const useFormValidation = (initialValues, validationSchema, options = {}) => {
+export const useFormValidation = (schema, options = {}) => {
   const {
-    validateOnChange = true,
-    validateOnBlur = true,
-    debounceMs = 300
-  } = options
+    defaultValues = {},
+    mode = 'onBlur', // Validação em tempo real ao sair do campo
+    reValidateMode = 'onChange',
+    onSubmitSuccess,
+    onSubmitError,
+    showToastOnError = true,
+    ...formOptions
+  } = options;
 
-  const [values, setValues] = useState(initialValues)
-  const [errors, setErrors] = useState({})
-  const [touched, setTouched] = useState({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isValid, setIsValid] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Debounced validation
-  const debouncedValidate = useCallback(
-    debounce((fieldName, value) => {
-      if (validationSchema) {
-        const validation = validationSchema({ ...values, [fieldName]: value })
-        setErrors(prev => ({
-          ...prev,
-          [fieldName]: validation.errors[fieldName]
-        }))
-      }
-    }, debounceMs),
-    [values, validationSchema, debounceMs]
-  )
+  const form = useForm({
+    resolver: zodResolver(schema),
+    defaultValues,
+    mode,
+    reValidateMode,
+    ...formOptions
+  });
 
-  // Validate single field
-  const validateField = useCallback((fieldName, value) => {
-    if (validationSchema) {
-      const validation = validationSchema({ ...values, [fieldName]: value })
-      setErrors(prev => ({
-        ...prev,
-        [fieldName]: validation.errors[fieldName]
-      }))
-      return !validation.errors[fieldName]
-    }
-    return true
-  }, [values, validationSchema])
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isDirty, touchedFields },
+    setError,
+    clearErrors,
+    reset,
+    watch,
+    setValue,
+    getValues
+  } = form;
 
-  // Validate entire form
-  const validateForm = useCallback(() => {
-    if (validationSchema) {
-      const validation = validationSchema(values)
-      setErrors(validation.errors)
-      setTouched(Object.keys(values).reduce((acc, key) => ({ ...acc, [key]: true }), {}))
-      setIsValid(validation.isValid)
-      return validation.isValid
-    }
-    return true
-  }, [values, validationSchema])
-
-  // Handle input change
-  const handleChange = useCallback((e) => {
-    const { name, value, type, checked } = e.target
-    const newValue = type === 'checkbox' ? checked : value
-
-    setValues(prev => ({ ...prev, [name]: newValue }))
-
-    if (validateOnChange && touched[name]) {
-      debouncedValidate(name, newValue)
-    }
-  }, [validateOnChange, touched, debouncedValidate])
-
-  // Handle input blur
-  const handleBlur = useCallback((e) => {
-    const { name, value } = e.target
-
-    setTouched(prev => ({ ...prev, [name]: true }))
-
-    if (validateOnBlur) {
-      validateField(name, value)
-    }
-  }, [validateOnBlur, validateField])
-
-  // Handle form submission
-  const handleSubmit = useCallback((onSubmit) => {
-    return async (e) => {
-      e.preventDefault()
-      
-      if (!validateForm()) {
-        return false
-      }
-
-      setIsSubmitting(true)
-      try {
-        await onSubmit(values)
-        return true
-      } catch (error) {
-        console.error('Form submission error:', error)
-        return false
-      } finally {
-        setIsSubmitting(false)
-      }
-    }
-  }, [values, validateForm])
-
-  // Reset form
-  const resetForm = useCallback(() => {
-    setValues(initialValues)
-    setErrors({})
-    setTouched({})
-    setIsSubmitting(false)
-    setIsValid(false)
-  }, [initialValues])
-
-  // Set field value programmatically
-  const setFieldValue = useCallback((fieldName, value) => {
-    setValues(prev => ({ ...prev, [fieldName]: value }))
+  /**
+   * Verifica se um campo específico é válido
+   */
+  const isFieldValid = useCallback((fieldName) => {
+    const fieldValue = watch(fieldName);
+    const hasError = !!errors[fieldName];
+    const isTouched = !!touchedFields[fieldName];
+    const hasValue = fieldValue !== undefined && fieldValue !== '' && fieldValue !== null;
     
-    if (touched[fieldName] && validateOnChange) {
-      debouncedValidate(fieldName, value)
+    return isTouched && hasValue && !hasError;
+  }, [errors, touchedFields, watch]);
+
+  /**
+   * Mapeia erros do backend para campos do formulário
+   */
+  const mapBackendErrors = useCallback((backendErrors) => {
+    if (!backendErrors || typeof backendErrors !== 'object') return;
+
+    Object.entries(backendErrors).forEach(([field, messages]) => {
+      const errorMessage = Array.isArray(messages) ? messages[0] : messages;
+      setError(field, {
+        type: 'server',
+        message: errorMessage
+      });
+    });
+  }, [setError]);
+
+  /**
+   * Wrapper para onSubmit com tratamento de erros
+   */
+  const createSubmitHandler = useCallback((onSubmit) => {
+    return handleSubmit(async (data) => {
+      setIsSubmitting(true);
+      clearErrors();
+
+      try {
+        const result = await onSubmit(data);
+        
+        if (onSubmitSuccess) {
+          onSubmitSuccess(result, data);
+        }
+        
+        return result;
+      } catch (error) {
+        console.error('Erro no formulário:', error);
+
+        // Mapear erros específicos do backend
+        if (error.response?.data?.error?.details) {
+          mapBackendErrors(error.response.data.error.details);
+        } else if (error.response?.data?.errors) {
+          mapBackendErrors(error.response.data.errors);
+        }
+
+        // Mostrar toast de erro se habilitado com mensagens mais claras
+        if (showToastOnError) {
+          let errorMessage = 'Erro ao processar formulário';
+          
+          if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+            errorMessage = 'Tempo limite excedido. Verifique sua conexão e tente novamente.';
+          } else if (error.response?.status === 400) {
+            errorMessage = error.response?.data?.error?.message || 'Dados inválidos. Verifique os campos e tente novamente.';
+          } else if (error.response?.status === 401) {
+            errorMessage = 'Sessão expirada. Faça login novamente.';
+          } else if (error.response?.status === 403) {
+            errorMessage = 'Acesso negado. Você não tem permissão para esta ação.';
+          } else if (error.response?.status === 404) {
+            errorMessage = 'Recurso não encontrado. Recarregue a página e tente novamente.';
+          } else if (error.response?.status >= 500) {
+            errorMessage = 'Erro interno do servidor. Tente novamente em alguns minutos.';
+          } else if (!navigator.onLine) {
+            errorMessage = 'Sem conexão com a internet. Verifique sua conexão e tente novamente.';
+          } else {
+            errorMessage = error.response?.data?.error?.message || 
+                          error.response?.data?.message || 
+                          'Erro inesperado. Tente novamente.';
+          }
+          
+          toastManager.error(errorMessage);
+        }
+
+        if (onSubmitError) {
+          onSubmitError(error, data);
+        }
+
+        throw error;
+      } finally {
+        setIsSubmitting(false);
+      }
+    });
+  }, [handleSubmit, clearErrors, mapBackendErrors, onSubmitSuccess, onSubmitError, showToastOnError]);
+
+  /**
+   * Reseta o formulário com novos valores
+   */
+  const resetForm = useCallback((newValues = defaultValues) => {
+    reset(newValues);
+    clearErrors();
+    setIsSubmitting(false);
+  }, [reset, clearErrors, defaultValues]);
+
+  /**
+   * Valida um campo específico
+   */
+  const validateField = useCallback(async (fieldName) => {
+    try {
+      const fieldValue = getValues(fieldName);
+      const fieldSchema = schema.shape[fieldName];
+      
+      if (fieldSchema) {
+        await fieldSchema.parseAsync(fieldValue);
+        clearErrors(fieldName);
+        return true;
+      }
+    } catch (error) {
+      if (error.errors?.[0]) {
+        setError(fieldName, {
+          type: 'validation',
+          message: error.errors[0].message
+        });
+      }
+      return false;
     }
-  }, [touched, validateOnChange, debouncedValidate])
+  }, [schema, getValues, setError, clearErrors]);
 
-  // Set field error programmatically
-  const setFieldError = useCallback((fieldName, error) => {
-    setErrors(prev => ({ ...prev, [fieldName]: error }))
-  }, [])
+  /**
+   * Obtém estatísticas do formulário
+   */
+  const getFormStats = useCallback(() => {
+    const totalFields = Object.keys(schema.shape).length;
+    const touchedCount = Object.keys(touchedFields).length;
+    const errorCount = Object.keys(errors).length;
+    const validCount = touchedCount - errorCount;
 
-  // Get field props for easy integration
-  const getFieldProps = useCallback((fieldName) => {
     return {
-      name: fieldName,
-      value: values[fieldName] || '',
-      onChange: handleChange,
-      onBlur: handleBlur,
-      error: touched[fieldName] && errors[fieldName],
-      isValid: touched[fieldName] && !errors[fieldName] && values[fieldName]
-    }
-  }, [values, errors, touched, handleChange, handleBlur])
+      totalFields,
+      touchedCount,
+      errorCount,
+      validCount,
+      completionPercentage: Math.round((validCount / totalFields) * 100)
+    };
+  }, [schema, touchedFields, errors]);
 
   return {
-    values,
-    errors,
-    touched,
-    isSubmitting,
-    isValid,
-    handleChange,
-    handleBlur,
-    handleSubmit,
+    // Métodos do react-hook-form
+    register,
+    handleSubmit: createSubmitHandler,
+    formState: { errors, isValid, isDirty, touchedFields },
+    setError,
+    clearErrors,
+    reset: resetForm,
+    watch,
+    setValue,
+    getValues,
+    
+    // Métodos personalizados
+    isFieldValid,
+    mapBackendErrors,
     validateField,
-    validateForm,
-    resetForm,
-    setFieldValue,
-    setFieldError,
-    getFieldProps
-  }
-}
+    getFormStats,
+    
+    // Estados
+    isSubmitting,
+    
+    // Utilitários
+    createSubmitHandler
+  };
+};
+
+export default useFormValidation;

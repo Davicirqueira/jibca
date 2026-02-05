@@ -179,14 +179,36 @@ class UserRepository {
    * @returns {Object|null} Usuário desativado ou null
    */
   static async deactivate(id) {
-    const result = await query(`
-      UPDATE users 
-      SET is_active = false, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $1
-      RETURNING id, name, email, role, phone, avatar_url, is_active, created_at, updated_at
-    `, [id]);
+    console.log('🔄 UserRepository.deactivate - Iniciando desativação para ID:', id);
+    
+    try {
+      const result = await query(`
+        UPDATE users 
+        SET is_active = false, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $1
+        RETURNING id, name, email, role, phone, avatar_url, is_active, created_at, updated_at
+      `, [id]);
 
-    return result.rows[0] || null;
+      console.log('📊 UserRepository.deactivate - Resultado da query:', {
+        rowCount: result.rowCount,
+        hasRows: result.rows.length > 0
+      });
+
+      if (result.rows.length > 0) {
+        console.log('✅ UserRepository.deactivate - Usuário desativado:', {
+          id: result.rows[0].id,
+          name: result.rows[0].name,
+          is_active: result.rows[0].is_active
+        });
+      } else {
+        console.log('❌ UserRepository.deactivate - Nenhuma linha afetada');
+      }
+
+      return result.rows[0] || null;
+    } catch (error) {
+      console.error('❌ UserRepository.deactivate - Erro na query:', error);
+      throw error;
+    }
   }
 
   /**
@@ -282,6 +304,19 @@ class UserRepository {
     `, [password_hash, id]);
 
     return result.rowCount > 0;
+  }
+
+  /**
+   * Contar membros ativos
+   * @returns {number} Número de membros ativos
+   */
+  static async countActiveMembers() {
+    const result = await query(`
+      SELECT COUNT(*) as count
+      FROM users
+      WHERE is_active = true
+    `);
+    return parseInt(result.rows[0].count) || 0;
   }
 }
 

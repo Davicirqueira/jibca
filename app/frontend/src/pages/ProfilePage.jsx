@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { userService } from '../services/userService'
 import LoadingSpinner from '../components/LoadingSpinner'
-import toast from 'react-hot-toast'
+import { toastManager } from '../utils/ToastManager'
 import { 
   User,
   Mail,
@@ -143,7 +143,7 @@ const ProfilePage = () => {
 
   const handleSave = async () => {
     if (!validateForm()) {
-      toast.error('Por favor, corrija os erros no formulário')
+      toastManager.error('Por favor, corrija os erros no formulário')
       return
     }
 
@@ -175,7 +175,7 @@ const ProfilePage = () => {
         confirmPassword: ''
       }))
       
-      toast.success('Perfil atualizado com sucesso!')
+      toastManager.success('Perfil atualizado com sucesso!')
     } catch (error) {
       console.error('Erro ao atualizar perfil:', error)
       
@@ -185,10 +185,10 @@ const ProfilePage = () => {
         } else if (error.response.data.message.includes('email')) {
           setErrors({ email: 'Este email já está em uso' })
         } else {
-          toast.error(error.response.data.message)
+          toastManager.error(error.response.data.message)
         }
       } else {
-        toast.error('Erro ao atualizar perfil')
+        toastManager.error('Erro ao atualizar perfil')
       }
     } finally {
       setLoading(false)

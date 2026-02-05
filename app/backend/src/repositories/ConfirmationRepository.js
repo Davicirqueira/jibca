@@ -340,6 +340,20 @@ class ConfirmationRepository {
 
     return result.rows[0];
   }
+
+  /**
+   * Contar confirmações ativas
+   * @returns {number} Número de confirmações ativas
+   */
+  static async countActiveConfirmations() {
+    const result = await query(`
+      SELECT COUNT(*) as count
+      FROM confirmations c
+      LEFT JOIN events e ON c.event_id = e.id
+      WHERE c.status = 'confirmed' AND e.date >= CURRENT_DATE
+    `);
+    return parseInt(result.rows[0].count) || 0;
+  }
 }
 
 module.exports = ConfirmationRepository;

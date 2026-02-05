@@ -93,6 +93,15 @@ async function seedDatabase() {
         time: '20:00',
         location: 'Sala da Juventude',
         duration: 90
+      },
+      {
+        title: 'Passeio ao Parque da Cidade',
+        description: 'Atividade recreativa ao ar livre com jogos e confraternização',
+        type: 'Passeio',
+        date: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000), // em 3 semanas
+        time: '14:00',
+        location: 'Parque da Cidade',
+        duration: 240 // 4 horas
       }
     ];
 

@@ -7,6 +7,7 @@ const userRoutes = require('./routes/users');
 const eventRoutes = require('./routes/events');
 const confirmationRoutes = require('./routes/confirmations');
 const notificationRoutes = require('./routes/notifications');
+const dashboardRoutes = require('./routes/dashboard');
 const NotificationService = require('./services/NotificationService');
 
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/events', eventRoutes);
 app.use('/api/v1/confirmations', confirmationRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
 
 // Rota de health check
 app.get('/health', (req, res) => {

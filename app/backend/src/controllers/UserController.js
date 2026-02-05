@@ -59,7 +59,8 @@ class UserController {
             email: newUser.email,
             role: newUser.role,
             phone: newUser.phone,
-            is_active: newUser.is_active,
+            active: newUser.is_active, // Mapear is_active para active
+            is_active: newUser.is_active, // Manter compatibilidade
             created_at: newUser.created_at
           }
         },
@@ -120,10 +121,16 @@ class UserController {
 
       const result = await UserRepository.list(options);
 
+      // Mapear is_active para active para compatibilidade com frontend
+      const usersWithActiveField = result.users.map(user => ({
+        ...user,
+        active: user.is_active
+      }));
+
       res.json({
         success: true,
         data: {
-          users: result.users,
+          users: usersWithActiveField,
           pagination: result.pagination
         }
       });
@@ -181,7 +188,8 @@ class UserController {
             role: user.role,
             phone: user.phone,
             avatar_url: user.avatar_url,
-            is_active: user.is_active,
+            active: user.is_active, // Mapear is_active para active
+            is_active: user.is_active, // Manter compatibilidade
             created_at: user.created_at,
             updated_at: user.updated_at
           }
@@ -279,7 +287,8 @@ class UserController {
             role: updatedUser.role,
             phone: updatedUser.phone,
             avatar_url: updatedUser.avatar_url,
-            is_active: updatedUser.is_active,
+            active: updatedUser.is_active, // Mapear is_active para active
+            is_active: updatedUser.is_active, // Manter compatibilidade
             created_at: updatedUser.created_at,
             updated_at: updatedUser.updated_at
           }
@@ -307,54 +316,38 @@ class UserController {
   static async deactivate(req, res) {
     try {
       const { id } = req.params;
-
-      if (!id || isNaN(parseInt(id))) {
-        return res.status(400).json({
-          success: false,
-          error: {
-            code: 'INVALID_ID',
-            message: 'ID do usuário deve ser um número válido'
-          }
-        });
-      }
-
       const userId = parseInt(id);
 
-      // Verificar se usuário existe
-      const existingUser = await UserRepository.findById(userId);
-      if (!existingUser) {
-        return res.status(404).json({
-          success: false,
-          error: {
-            code: 'USER_NOT_FOUND',
-            message: 'Usuário não encontrado'
-          }
-        });
-      }
+      console.log('🔍 DEBUG - Desativação de membro iniciada:', {
+        targetUserId: userId,
+        requesterId: req.user.id,
+        requesterRole: req.user.role,
+        requesterName: req.user.name
+      });
 
-      // Não permitir desativar o próprio usuário
-      if (userId === req.user.id) {
-        return res.status(400).json({
-          success: false,
-          error: {
-            code: 'CANNOT_DEACTIVATE_SELF',
-            message: 'Você não pode desativar sua própria conta'
-          }
-        });
-      }
+      // As validações de permissão já foram feitas no middleware requireLeaderForDeactivation
+      // Aqui só precisamos executar a desativação
 
-      // Não permitir desativar outros líderes
-      if (existingUser.role === 'leader') {
-        return res.status(400).json({
-          success: false,
-          error: {
-            code: 'CANNOT_DEACTIVATE_LEADER',
-            message: 'Não é possível desativar outros líderes'
-          }
-        });
-      }
-
+      console.log('🔄 Executando desativação...');
       const deactivatedUser = await UserRepository.deactivate(userId);
+
+      if (!deactivatedUser) {
+        console.log('❌ Falha na desativação - repository retornou null');
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'DEACTIVATION_FAILED',
+            message: 'Falha ao desativar usuário'
+          }
+        });
+      }
+
+      console.log('✅ Usuário desativado com sucesso:', {
+        id: deactivatedUser.id,
+        name: deactivatedUser.name,
+        is_active: deactivatedUser.is_active,
+        updated_at: deactivatedUser.updated_at
+      });
 
       res.json({
         success: true,
@@ -364,7 +357,11 @@ class UserController {
             name: deactivatedUser.name,
             email: deactivatedUser.email,
             role: deactivatedUser.role,
-            is_active: deactivatedUser.is_active,
+            phone: deactivatedUser.phone,
+            avatar_url: deactivatedUser.avatar_url,
+            active: deactivatedUser.is_active, // Mapear is_active para active
+            is_active: deactivatedUser.is_active, // Manter compatibilidade
+            created_at: deactivatedUser.created_at,
             updated_at: deactivatedUser.updated_at
           }
         },
@@ -372,7 +369,7 @@ class UserController {
       });
 
     } catch (error) {
-      console.error('Erro ao desativar usuário:', error);
+      console.error('❌ Erro ao desativar usuário:', error);
       
       res.status(500).json({
         success: false,

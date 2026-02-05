@@ -545,3 +545,232 @@ body {
 .gradient-corporate-light {
   background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
 }
+
+/* ===== ESTILOS PARA COMPONENTES DE LOADING ===== */
+
+/* Skeleton Loading */
+.skeleton-card {
+  @apply bg-white rounded-2xl border border-gray-100 p-6 animate-pulse;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.skeleton-header {
+  @apply h-6 bg-gray-200 rounded-lg mb-4;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-content {
+  @apply space-y-3 mb-4;
+}
+
+.skeleton-line {
+  @apply h-4 bg-gray-200 rounded;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-line-long {
+  @apply w-full;
+}
+
+.skeleton-line-medium {
+  @apply w-3/4;
+}
+
+.skeleton-line-short {
+  @apply w-1/2;
+}
+
+.skeleton-footer {
+  @apply h-10 bg-gray-200 rounded-lg;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Empty/Error State */
+.empty-state {
+  @apply min-h-[500px] flex flex-col items-center justify-center p-12 bg-gray-50 rounded-2xl mx-6;
+}
+
+.icon-empty {
+  @apply w-20 h-20 text-red-900 opacity-60 mb-6;
+  color: var(--primary-darkred);
+}
+
+.icon-error {
+  @apply w-16 h-16 text-red-600 mb-6;
+}
+
+.empty-title {
+  @apply text-2xl font-semibold text-gray-900 mb-3 text-center;
+}
+
+.empty-description {
+  @apply text-base text-gray-600 text-center max-w-md leading-relaxed mb-8;
+}
+
+/* Page Container */
+.page-container {
+  @apply space-y-8 p-6;
+}
+
+.page-header {
+  @apply flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0;
+}
+
+/* Animação shimmer para skeleton */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Estados responsivos para mobile */
+@media (max-width: 640px) {
+  .empty-state {
+    @apply min-h-[400px] p-8 mx-4;
+  }
+  
+  .icon-empty {
+    @apply w-16 h-16 mb-4;
+  }
+  
+  .icon-error {
+    @apply w-12 h-12 mb-4;
+  }
+  
+  .empty-title {
+    @apply text-xl mb-2;
+  }
+  
+  .empty-description {
+    @apply text-sm mb-6;
+  }
+  
+  .skeleton-card {
+    @apply p-4 rounded-lg;
+  }
+  
+  .page-container {
+    @apply space-y-6 p-4;
+  }
+}
+
+/* Estados de hover para botões de retry */
+.btn-primary:hover .w-4 {
+  @apply animate-spin;
+}
+
+/* Form Components */
+.form-field {
+  @apply mb-6;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+.form-error {
+  @apply flex items-start mt-2 text-sm;
+}
+
+.form-submit {
+  @apply mt-8;
+}
+
+/* Form validation states */
+.form-input-valid {
+  @apply border-green-300 bg-green-50 text-green-900;
+}
+
+.form-input-invalid {
+  @apply border-red-300 bg-red-50 text-red-900 placeholder-red-400;
+}
+
+.form-input-default {
+  @apply border-gray-300 bg-white text-gray-900 placeholder-gray-400;
+}
+
+/* Form focus states */
+.form-input:focus {
+  @apply outline-none ring-2 ring-red-500 border-transparent;
+}
+
+/* Form disabled states */
+.form-input:disabled {
+  @apply bg-gray-100 text-gray-500 cursor-not-allowed;
+}
+
+/* Validation icons */
+.validation-icon-success {
+  @apply text-green-500;
+}
+
+.validation-icon-error {
+  @apply text-red-500;
+}
+
+/* Form animations */
+.form-field-enter {
+  @apply opacity-0 transform translate-y-2;
+}
+
+.form-field-enter-active {
+  @apply opacity-100 transform translate-y-0 transition-all duration-300;
+}
+
+.form-error-enter {
+  @apply opacity-0 transform -translate-y-1;
+}
+
+.form-error-enter-active {
+  @apply opacity-100 transform translate-y-0 transition-all duration-200;
+}
+
+/* Transições suaves para mudanças de estado */
+.state-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+/* Loading overlay para casos específicos */
+.loading-overlay {
+  @apply absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-2xl;
+}
+
+.loading-overlay-dark {
+  @apply absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-10 rounded-2xl;
+}
+
+/* Indicadores de progresso */
+.progress-bar {
+  @apply w-full bg-gray-200 rounded-full h-2 overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full bg-red-900 transition-all duration-300 ease-out;
+  background-color: var(--primary-darkred);
+}
+
+/* Estados de conexão */
+.connection-status {
+  @apply fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-sm font-medium;
+}
+
+.connection-online {
+  @apply bg-green-100 text-green-800 border border-green-200;
+}
+
+.connection-offline {
+  @apply bg-red-100 text-red-800 border border-red-200;
+}
+
+.connection-slow {
+  @apply bg-yellow-100 text-yellow-800 border border-yellow-200;
+}

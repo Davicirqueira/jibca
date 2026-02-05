@@ -22,7 +22,7 @@ const createEventValidation = [
     .withMessage('Tipo de evento deve ser válido'),
   body('date')
     .isISO8601()
-    .withMessage('Data deve ser válida'),
+    .withMessage('Data deve ser válida no formato ISO 8601 (YYYY-MM-DD)'),
   body('time')
     .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
     .withMessage('Horário deve estar no formato HH:MM'),
@@ -32,6 +32,7 @@ const createEventValidation = [
     .isLength({ max: 200 })
     .withMessage('Local deve ter no máximo 200 caracteres'),
   body('duration_minutes')
+    .optional() // Tornando opcional para permitir default
     .isInt({ min: 15, max: 1440 })
     .withMessage('Duração deve ser entre 15 minutos e 24 horas')
 ];

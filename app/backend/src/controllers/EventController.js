@@ -11,12 +11,18 @@ class EventController {
       // Verificar erros de validação
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        // Formatar erros por campo para melhor debugging
+        const fieldErrors = errors.array().reduce((acc, err) => {
+          acc[err.path] = err.msg;
+          return acc;
+        }, {});
+
         return res.status(400).json({
           success: false,
           error: {
             code: 'VALIDATION_ERROR',
             message: 'Dados inválidos fornecidos',
-            details: errors.array()
+            details: fieldErrors
           }
         });
       }
@@ -60,6 +66,17 @@ class EventController {
         });
       }
 
+      // Verificar se usuário está autenticado e tem ID
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({
+          success: false,
+          error: {
+            code: 'UNAUTHORIZED',
+            message: 'Usuário não autenticado'
+          }
+        });
+      }
+
       const eventData = {
         title: title.trim(),
         description: description?.trim(),
@@ -67,7 +84,7 @@ class EventController {
         date,
         time,
         location: location?.trim(),
-        duration_minutes,
+        duration_minutes: duration_minutes || 120, // Default 2 horas
         created_by: req.user.id
       };
 
@@ -91,7 +108,8 @@ class EventController {
         success: false,
         error: {
           code: 'CREATE_EVENT_ERROR',
-          message: 'Erro interno ao criar evento'
+          message: 'Erro interno ao criar evento',
+          detail: process.env.NODE_ENV === 'development' ? error.message : undefined
         }
       });
     }

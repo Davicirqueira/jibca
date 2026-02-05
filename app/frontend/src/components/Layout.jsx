@@ -15,7 +15,7 @@ import {
   X,
   Church
 } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toastManager } from '../utils/ToastManager'
 
 const Layout = ({ children }) => {
   const { user, logout, isLeader } = useAuth()
@@ -28,7 +28,7 @@ const Layout = ({ children }) => {
       await logout()
       navigate('/login')
     } catch (error) {
-      toast.error('Erro ao fazer logout')
+      toastManager.error('Erro ao fazer logout')
     }
   }
 
@@ -185,7 +185,7 @@ const Layout = ({ children }) => {
       <footer className="bg-gray-50 border-t border-gray-200 mt-auto mb-16 md:mb-0">
         <div className="max-w-7xl mx-auto container-responsive py-6">
           <div className="text-center text-sm text-gray-600">
-            <p>© 2026 JIBCA - Juventude da Igreja Batista Castro Alves</p>
+            <p>© {new Date().getFullYear()} JIBCA - Juventude da Igreja Batista Castro Alves</p>
           </div>
         </div>
       </footer>

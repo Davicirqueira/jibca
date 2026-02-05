@@ -377,6 +377,18 @@ class EventRepository {
 
     return result.rows;
   }
+  /**
+   * Contar eventos futuros
+   * @returns {number} Número de eventos futuros
+   */
+  static async countUpcomingEvents() {
+    const result = await query(`
+      SELECT COUNT(*) as count
+      FROM events
+      WHERE date >= CURRENT_DATE
+    `);
+    return parseInt(result.rows[0].count) || 0;
+  }
 }
 
 module.exports = EventRepository;

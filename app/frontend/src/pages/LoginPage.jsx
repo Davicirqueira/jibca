@@ -229,10 +229,33 @@ const LoginPage = () => {
             </div>
           </form>
 
-          {/* Footer do Card */}
+          {/* Versículo Bíblico */}
           <div className="border-t border-gray-100 pt-6 mt-8">
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-3">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" clipRule="evenodd" />
+                    <path d="M8 6h4v2H8V6zM8 10h4v2H8v-2z" />
+                  </svg>
+                </div>
+              </div>
+              <blockquote className="text-sm text-gray-600 italic mb-2">
+                "Ninguém o despreze pelo fato de você ser jovem"
+              </blockquote>
+              <cite className="text-xs text-gray-500 font-medium">
+                1 Timóteo 4:12
+              </cite>
+              <p className="text-xs text-gray-400 mt-2">
+                Fundamento espiritual da JIBCA
+              </p>
+            </div>
+          </div>
+
+          {/* Footer do Card */}
+          <div className="border-t border-gray-100 pt-6 mt-4">
             <p className="text-center text-sm text-gray-500">
-              © 2026 JIBCA - Juventude da Igreja Batista Castro Alves
+              © {new Date().getFullYear()} JIBCA - Juventude da Igreja Batista Castro Alves
             </p>
           </div>
         </div>

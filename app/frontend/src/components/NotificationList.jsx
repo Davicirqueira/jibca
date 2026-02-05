@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { notificationService } from '../services/notificationService'
 import NotificationCard from './NotificationCard'
 import LoadingSpinner from './LoadingSpinner'
-import toast from 'react-hot-toast'
+import { toastManager } from '../utils/ToastManager'
 import { 
   Bell, 
   BellRing,
@@ -72,7 +72,7 @@ const NotificationList = () => {
     } catch (error) {
       console.error('Erro ao carregar notificações:', error)
       if (!silent) {
-        toast.error('Erro ao carregar notificações')
+        toastManager.error('Erro ao carregar notificações')
       }
     } finally {
       setLoading(false)
@@ -83,9 +83,9 @@ const NotificationList = () => {
     try {
       setRefreshing(true)
       await loadNotifications()
-      toast.success('Notificações atualizadas!')
+      toastManager.success('Notificações atualizadas!')
     } catch (error) {
-      toast.error('Erro ao atualizar notificações')
+      toastManager.error('Erro ao atualizar notificações')
     } finally {
       setRefreshing(false)
     }
@@ -119,10 +119,10 @@ const NotificationList = () => {
         read: prev.read + 1
       }))
 
-      toast.success('Notificação marcada como lida')
+      toastManager.success('Notificação marcada como lida')
     } catch (error) {
       console.error('Erro ao marcar notificação como lida:', error)
-      toast.error('Erro ao marcar notificação como lida')
+      toastManager.error('Erro ao marcar notificação como lida')
     }
   }
 
@@ -143,10 +143,10 @@ const NotificationList = () => {
         read: prev.total
       }))
 
-      toast.success('Todas as notificações foram marcadas como lidas')
+      toastManager.success('Todas as notificações foram marcadas como lidas')
     } catch (error) {
       console.error('Erro ao marcar todas como lidas:', error)
-      toast.error('Erro ao marcar todas as notificações como lidas')
+      toastManager.error('Erro ao marcar todas as notificações como lidas')
     }
   }
 

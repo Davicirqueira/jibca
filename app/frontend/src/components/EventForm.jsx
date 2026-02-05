@@ -2,18 +2,17 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { eventService } from '../services/eventService'
 import { useAuth } from '../context/AuthContext'
+import { useFormValidation } from '../hooks/useFormValidation'
+import { eventSchema } from '../schemas/validationSchemas'
 import LoadingSpinner from './LoadingSpinner'
-import toast from 'react-hot-toast'
+import FormInput from './form/FormInput'
+import FormSelect from './form/FormSelect'
+import FormTextarea from './form/FormTextarea'
+import FormSubmitButton from './form/FormSubmitButton'
+import { toastManager } from '../utils/ToastManager'
 import { 
   Calendar,
-  Clock,
-  MapPin,
-  FileText,
-  Users,
   Save,
-  X,
-  AlertCircle,
-  CheckCircle2,
   ArrowLeft
 } from 'lucide-react'
 
@@ -23,22 +22,50 @@ const EventForm = ({ eventId = null, onClose = null, onSuccess = null }) => {
   const [loading, setLoading] = useState(false)
   const [loadingTypes, setLoadingTypes] = useState(true)
   const [eventTypes, setEventTypes] = useState([])
-  const [errors, setErrors] = useState({})
-  const [touched, setTouched] = useState({})
+  const [submitError, setSubmitError] = useState(null)
+  const [lastSubmitAttempt, setLastSubmitAttempt] = useState(null)
 
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    date: '',
-    time: '',
-    location: '',
-    event_type_id: ''
-  })
+  // Configurar validação do formulário
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    isFieldValid,
+    isSubmitting,
+    setValue
+  } = useFormValidation(eventSchema, {
+    defaultValues: {
+      title: '',
+      description: '',
+      date: '',
+      time: '',
+      location: '',
+      event_type_id: ''
+    },
+    onSubmitSuccess: (result) => {
+      const message = eventId ? 'Evento atualizado com sucesso!' : 'Evento criado com sucesso!';
+      toastManager.success(message);
+      
+      // Limpar estados de erro
+      setSubmitError(null);
+      setLastSubmitAttempt(null);
+      
+      if (onSuccess) {
+        onSuccess(result);
+      } else {
+        navigate('/events');
+      }
+    },
+    onSubmitError: (error) => {
+      setSubmitError(error);
+      setLastSubmitAttempt(Date.now());
+    }
+  });
 
   // Verificar permissão de líder
   useEffect(() => {
     if (!isLeader()) {
-      toast.error('Acesso negado: Apenas líderes podem gerenciar eventos')
+      toastManager.error('Acesso negado: Apenas líderes podem gerenciar eventos')
       if (onClose) {
         onClose()
       } else {
@@ -67,7 +94,7 @@ const EventForm = ({ eventId = null, onClose = null, onSuccess = null }) => {
       setEventTypes(types)
     } catch (error) {
       console.error('Erro ao carregar tipos de evento:', error)
-      toast.error('Erro ao carregar tipos de evento')
+      toastManager.error('Erro ao carregar tipos de evento')
     } finally {
       setLoadingTypes(false)
     }
@@ -78,181 +105,38 @@ const EventForm = ({ eventId = null, onClose = null, onSuccess = null }) => {
       setLoading(true)
       const event = await eventService.getEventById(eventId)
       
-      setFormData({
-        title: event.title || '',
-        description: event.description || '',
-        date: event.date || '',
-        time: event.time || '',
-        location: event.location || '',
-        event_type_id: event.event_type_id || ''
-      })
+      // Atualizar formulário com dados do evento
+      setValue('title', event.title || '')
+      setValue('description', event.description || '')
+      setValue('date', event.date || '')
+      setValue('time', event.time || '')
+      setValue('location', event.location || '')
+      setValue('event_type_id', event.event_type_id || '')
     } catch (error) {
       console.error('Erro ao carregar evento:', error)
-      toast.error('Erro ao carregar dados do evento')
+      toastManager.error('Erro ao carregar dados do evento')
     } finally {
       setLoading(false)
     }
   }
 
-  const validateField = (name, value) => {
-    const fieldErrors = {}
-
-    switch (name) {
-      case 'title':
-        if (!value.trim()) {
-          fieldErrors.title = 'Título é obrigatório'
-        } else if (value.trim().length < 3) {
-          fieldErrors.title = 'Título deve ter pelo menos 3 caracteres'
-        } else if (value.trim().length > 100) {
-          fieldErrors.title = 'Título deve ter no máximo 100 caracteres'
-        }
-        break
-
-      case 'description':
-        if (!value.trim()) {
-          fieldErrors.description = 'Descrição é obrigatória'
-        } else if (value.trim().length < 10) {
-          fieldErrors.description = 'Descrição deve ter pelo menos 10 caracteres'
-        } else if (value.trim().length > 500) {
-          fieldErrors.description = 'Descrição deve ter no máximo 500 caracteres'
-        }
-        break
-
-      case 'date':
-        if (!value) {
-          fieldErrors.date = 'Data é obrigatória'
-        } else {
-          const selectedDate = new Date(value)
-          const today = new Date()
-          today.setHours(0, 0, 0, 0)
-          
-          if (selectedDate < today) {
-            fieldErrors.date = 'Data não pode ser no passado'
-          }
-        }
-        break
-
-      case 'time':
-        if (!value) {
-          fieldErrors.time = 'Horário é obrigatório'
-        } else {
-          const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/
-          if (!timeRegex.test(value)) {
-            fieldErrors.time = 'Formato de horário inválido (HH:MM)'
-          }
-        }
-        break
-
-      case 'location':
-        if (!value.trim()) {
-          fieldErrors.location = 'Local é obrigatório'
-        } else if (value.trim().length < 3) {
-          fieldErrors.location = 'Local deve ter pelo menos 3 caracteres'
-        } else if (value.trim().length > 100) {
-          fieldErrors.location = 'Local deve ter no máximo 100 caracteres'
-        }
-        break
-
-      case 'event_type_id':
-        if (!value) {
-          fieldErrors.event_type_id = 'Tipo de evento é obrigatório'
-        }
-        break
+  // Função de submit do formulário
+  const onSubmit = async (data) => {
+    // Limpar erro anterior ao tentar novamente
+    setSubmitError(null);
+    
+    const eventData = {
+      ...data,
+      title: data.title.trim(),
+      description: data.description?.trim() || '',
+      location: data.location?.trim() || '',
+      event_type_id: parseInt(data.event_type_id)
     }
 
-    return fieldErrors
-  }
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-
-    // Validação em tempo real
-    if (touched[name]) {
-      const fieldErrors = validateField(name, value)
-      setErrors(prev => ({
-        ...prev,
-        ...fieldErrors,
-        [name]: fieldErrors[name] || undefined
-      }))
-    }
-  }
-
-  const handleBlur = (e) => {
-    const { name, value } = e.target
-    
-    setTouched(prev => ({
-      ...prev,
-      [name]: true
-    }))
-
-    const fieldErrors = validateField(name, value)
-    setErrors(prev => ({
-      ...prev,
-      ...fieldErrors
-    }))
-  }
-
-  const validateForm = () => {
-    const allErrors = {}
-    
-    Object.keys(formData).forEach(field => {
-      const fieldErrors = validateField(field, formData[field])
-      Object.assign(allErrors, fieldErrors)
-    })
-
-    setErrors(allErrors)
-    setTouched(Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {}))
-    
-    return Object.keys(allErrors).length === 0
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    
-    if (!validateForm()) {
-      toast.error('Por favor, corrija os erros no formulário')
-      return
-    }
-
-    try {
-      setLoading(true)
-      
-      const eventData = {
-        ...formData,
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        location: formData.location.trim()
-      }
-
-      let result
-      if (eventId) {
-        result = await eventService.updateEvent(eventId, eventData)
-        toast.success('Evento atualizado com sucesso!')
-      } else {
-        result = await eventService.createEvent(eventData)
-        toast.success('Evento criado com sucesso!')
-      }
-
-      if (onSuccess) {
-        onSuccess(result)
-      } else {
-        navigate('/events')
-      }
-    } catch (error) {
-      console.error('Erro ao salvar evento:', error)
-      
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message)
-      } else {
-        toast.error(eventId ? 'Erro ao atualizar evento' : 'Erro ao criar evento')
-      }
-    } finally {
-      setLoading(false)
+    if (eventId) {
+      return await eventService.updateEvent(eventId, eventData)
+    } else {
+      return await eventService.createEvent(eventData)
     }
   }
 
@@ -264,13 +148,11 @@ const EventForm = ({ eventId = null, onClose = null, onSuccess = null }) => {
     }
   }
 
-  const getFieldError = (fieldName) => {
-    return touched[fieldName] && errors[fieldName]
-  }
-
-  const isFieldValid = (fieldName) => {
-    return touched[fieldName] && !errors[fieldName] && formData[fieldName]
-  }
+  // Preparar opções para o select de tipos de evento
+  const eventTypeOptions = eventTypes.map(type => ({
+    value: type.id,
+    label: type.name
+  }))
 
   if (loadingTypes) {
     return (
@@ -280,311 +162,172 @@ const EventForm = ({ eventId = null, onClose = null, onSuccess = null }) => {
     )
   }
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <LoadingSpinner size="large" />
+        <span className="ml-3 text-gray-600">Carregando dados do evento...</span>
+      </div>
+    )
+  }
+
   return (
-    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-      {/* Header Corporativo */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
-              <Calendar className="w-8 h-8 text-white" />
-            </div>
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-red-900 to-red-800 px-8 py-6">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">
+              <h1 className="text-2xl font-bold text-white">
                 {eventId ? 'Editar Evento' : 'Criar Novo Evento'}
               </h1>
-              <p className="text-slate-200 text-sm font-medium">
-                Sistema de Gestão de Eventos JIBCA
+              <p className="text-red-100 mt-1">
+                {eventId ? 'Atualize as informações do evento' : 'Preencha os dados para criar um novo evento'}
               </p>
             </div>
+            <div className="bg-white/20 p-3 rounded-xl">
+              <Calendar className="w-8 h-8 text-white" />
+            </div>
           </div>
-          
-          <button
-            onClick={handleCancel}
-            className="p-2 hover:bg-white/20 rounded-xl transition-colors duration-200"
-            disabled={loading}
-          >
-            <X className="w-6 h-6" />
-          </button>
         </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-6">
+          {/* Título */}
+          <FormInput
+            label="Título do Evento"
+            name="title"
+            placeholder="Digite o título do evento"
+            register={register}
+            error={errors.title}
+            isValid={isFieldValid('title')}
+            required
+            disabled={isSubmitting}
+          />
+
+          {/* Descrição */}
+          <FormTextarea
+            label="Descrição"
+            name="description"
+            placeholder="Descreva o evento (opcional)"
+            rows={4}
+            maxLength={500}
+            register={register}
+            error={errors.description}
+            isValid={isFieldValid('description')}
+            disabled={isSubmitting}
+          />
+
+          {/* Data e Horário */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormInput
+              label="Data"
+              name="date"
+              type="date"
+              register={register}
+              error={errors.date}
+              isValid={isFieldValid('date')}
+              required
+              disabled={isSubmitting}
+            />
+
+            <FormInput
+              label="Horário"
+              name="time"
+              type="time"
+              register={register}
+              error={errors.time}
+              isValid={isFieldValid('time')}
+              required
+              disabled={isSubmitting}
+            />
+          </div>
+
+          {/* Local e Tipo */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormInput
+              label="Local"
+              name="location"
+              placeholder="Local do evento (opcional)"
+              register={register}
+              error={errors.location}
+              isValid={isFieldValid('location')}
+              disabled={isSubmitting}
+            />
+
+            <FormSelect
+              label="Tipo de Evento"
+              name="event_type_id"
+              placeholder="Selecione o tipo de evento"
+              options={eventTypeOptions}
+              register={register}
+              error={errors.event_type_id}
+              isValid={isFieldValid('event_type_id')}
+              required
+              disabled={isSubmitting}
+            />
+          </div>
+
+          {/* Error Display */}
+          {submitError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <div className="flex-shrink-0">
+                  <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-medium text-red-800">
+                    Erro ao {eventId ? 'atualizar' : 'criar'} evento
+                  </h3>
+                  <div className="mt-1 text-sm text-red-700">
+                    <p>
+                      {submitError.response?.data?.error?.message || 
+                       submitError.message || 
+                       'Ocorreu um erro inesperado. Tente novamente.'}
+                    </p>
+                  </div>
+                  <div className="mt-3">
+                    <button
+                      type="button"
+                      onClick={() => setSubmitError(null)}
+                      className="text-sm text-red-600 hover:text-red-500 font-medium"
+                    >
+                      Dispensar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Botões de Ação */}
+          <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="flex items-center space-x-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all duration-200 disabled:opacity-50"
+              disabled={isSubmitting}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Cancelar</span>
+            </button>
+
+            <FormSubmitButton
+              isLoading={isSubmitting}
+              isValid={isValid}
+              hasErrors={Object.keys(errors).length > 0}
+              showRetryHint={submitError && !isSubmitting}
+              loadingText={eventId ? 'Atualizando...' : 'Criando...'}
+              className="flex items-center space-x-2 px-8"
+            >
+              <Save className="w-4 h-4" />
+              <span>{eventId ? 'Atualizar Evento' : 'Criar Evento'}</span>
+            </FormSubmitButton>
+          </div>
+        </form>
       </div>
-
-      {/* Formulário */}
-      <form onSubmit={handleSubmit} className="p-8 space-y-8">
-        {/* Título do Evento */}
-        <div className="space-y-2">
-          <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-            <FileText className="w-4 h-4 text-blue-600" />
-            <span>Título do Evento</span>
-            <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              onBlur={handleBlur}
-              placeholder="Digite o título do evento"
-              className={`w-full px-4 py-3 border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 ${
-                getFieldError('title')
-                  ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                  : isFieldValid('title')
-                  ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                  : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-              }`}
-              disabled={loading}
-            />
-            {isFieldValid('title') && (
-              <CheckCircle2 className="absolute right-3 top-3 w-5 h-5 text-green-500" />
-            )}
-            {getFieldError('title') && (
-              <AlertCircle className="absolute right-3 top-3 w-5 h-5 text-red-500" />
-            )}
-          </div>
-          {getFieldError('title') && (
-            <p className="text-red-600 text-sm font-medium flex items-center space-x-1">
-              <AlertCircle className="w-4 h-4" />
-              <span>{errors.title}</span>
-            </p>
-          )}
-        </div>
-
-        {/* Descrição */}
-        <div className="space-y-2">
-          <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-            <FileText className="w-4 h-4 text-blue-600" />
-            <span>Descrição</span>
-            <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              onBlur={handleBlur}
-              placeholder="Descreva os detalhes do evento"
-              rows={4}
-              className={`w-full px-4 py-3 border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 resize-none ${
-                getFieldError('description')
-                  ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                  : isFieldValid('description')
-                  ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                  : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-              }`}
-              disabled={loading}
-            />
-            {isFieldValid('description') && (
-              <CheckCircle2 className="absolute right-3 top-3 w-5 h-5 text-green-500" />
-            )}
-            {getFieldError('description') && (
-              <AlertCircle className="absolute right-3 top-3 w-5 h-5 text-red-500" />
-            )}
-          </div>
-          {getFieldError('description') && (
-            <p className="text-red-600 text-sm font-medium flex items-center space-x-1">
-              <AlertCircle className="w-4 h-4" />
-              <span>{errors.description}</span>
-            </p>
-          )}
-        </div>
-
-        {/* Data e Horário */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Data */}
-          <div className="space-y-2">
-            <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-              <Calendar className="w-4 h-4 text-blue-600" />
-              <span>Data</span>
-              <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleInputChange}
-                onBlur={handleBlur}
-                className={`w-full px-4 py-3 border rounded-xl text-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 ${
-                  getFieldError('date')
-                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                    : isFieldValid('date')
-                    ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                }`}
-                disabled={loading}
-              />
-              {isFieldValid('date') && (
-                <CheckCircle2 className="absolute right-3 top-3 w-5 h-5 text-green-500" />
-              )}
-              {getFieldError('date') && (
-                <AlertCircle className="absolute right-3 top-3 w-5 h-5 text-red-500" />
-              )}
-            </div>
-            {getFieldError('date') && (
-              <p className="text-red-600 text-sm font-medium flex items-center space-x-1">
-                <AlertCircle className="w-4 h-4" />
-                <span>{errors.date}</span>
-              </p>
-            )}
-          </div>
-
-          {/* Horário */}
-          <div className="space-y-2">
-            <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-              <Clock className="w-4 h-4 text-blue-600" />
-              <span>Horário</span>
-              <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type="time"
-                name="time"
-                value={formData.time}
-                onChange={handleInputChange}
-                onBlur={handleBlur}
-                className={`w-full px-4 py-3 border rounded-xl text-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 ${
-                  getFieldError('time')
-                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                    : isFieldValid('time')
-                    ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                }`}
-                disabled={loading}
-              />
-              {isFieldValid('time') && (
-                <CheckCircle2 className="absolute right-3 top-3 w-5 h-5 text-green-500" />
-              )}
-              {getFieldError('time') && (
-                <AlertCircle className="absolute right-3 top-3 w-5 h-5 text-red-500" />
-              )}
-            </div>
-            {getFieldError('time') && (
-              <p className="text-red-600 text-sm font-medium flex items-center space-x-1">
-                <AlertCircle className="w-4 h-4" />
-                <span>{errors.time}</span>
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Local e Tipo */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Local */}
-          <div className="space-y-2">
-            <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-              <MapPin className="w-4 h-4 text-blue-600" />
-              <span>Local</span>
-              <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-                onBlur={handleBlur}
-                placeholder="Local do evento"
-                className={`w-full px-4 py-3 border rounded-xl text-gray-900 placeholder-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 ${
-                  getFieldError('location')
-                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                    : isFieldValid('location')
-                    ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                }`}
-                disabled={loading}
-              />
-              {isFieldValid('location') && (
-                <CheckCircle2 className="absolute right-3 top-3 w-5 h-5 text-green-500" />
-              )}
-              {getFieldError('location') && (
-                <AlertCircle className="absolute right-3 top-3 w-5 h-5 text-red-500" />
-              )}
-            </div>
-            {getFieldError('location') && (
-              <p className="text-red-600 text-sm font-medium flex items-center space-x-1">
-                <AlertCircle className="w-4 h-4" />
-                <span>{errors.location}</span>
-              </p>
-            )}
-          </div>
-
-          {/* Tipo de Evento */}
-          <div className="space-y-2">
-            <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-              <Users className="w-4 h-4 text-blue-600" />
-              <span>Tipo de Evento</span>
-              <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <select
-                name="event_type_id"
-                value={formData.event_type_id}
-                onChange={handleInputChange}
-                onBlur={handleBlur}
-                className={`w-full px-4 py-3 border rounded-xl text-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 ${
-                  getFieldError('event_type_id')
-                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                    : isFieldValid('event_type_id')
-                    ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                }`}
-                disabled={loading}
-              >
-                <option value="">Selecione o tipo de evento</option>
-                {eventTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-              </select>
-              {isFieldValid('event_type_id') && (
-                <CheckCircle2 className="absolute right-8 top-3 w-5 h-5 text-green-500" />
-              )}
-              {getFieldError('event_type_id') && (
-                <AlertCircle className="absolute right-8 top-3 w-5 h-5 text-red-500" />
-              )}
-            </div>
-            {getFieldError('event_type_id') && (
-              <p className="text-red-600 text-sm font-medium flex items-center space-x-1">
-                <AlertCircle className="w-4 h-4" />
-                <span>{errors.event_type_id}</span>
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Botões de Ação */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="flex items-center space-x-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all duration-200"
-            disabled={loading}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Cancelar</span>
-          </button>
-
-          <button
-            type="submit"
-            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <LoadingSpinner size="small" />
-                <span>Salvando...</span>
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                <span>{eventId ? 'Atualizar Evento' : 'Criar Evento'}</span>
-              </>
-            )}
-          </button>
-        </div>
-      </form>
     </div>
   )
 }

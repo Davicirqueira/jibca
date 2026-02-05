@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { authService } from '../services/authService'
-import toast from 'react-hot-toast'
+import { toastManager } from '../utils/ToastManager'
 
 const AuthContext = createContext({})
 
@@ -57,11 +57,11 @@ export const AuthProvider = ({ children }) => {
       setUser(userData)
       setIsAuthenticated(true)
       
-      toast.success(`Bem-vindo(a), ${userData.name}!`)
+      toastManager.success(`Bem-vindo(a), ${userData.name}!`)
       return userData
     } catch (error) {
       const errorMessage = error.response?.data?.error?.message || 'Erro ao fazer login'
-      toast.error(errorMessage)
+      toastManager.error(errorMessage)
       throw error
     } finally {
       setLoading(false)
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setUser(null)
       setIsAuthenticated(false)
-      toast.success('Logout realizado com sucesso')
+      toastManager.success('Logout realizado com sucesso')
     }
   }
 

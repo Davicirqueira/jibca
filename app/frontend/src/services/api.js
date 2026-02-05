@@ -1,5 +1,5 @@
 import axios from 'axios'
-import toast from 'react-hot-toast'
+import { toastManager } from '../utils/ToastManager'
 
 // Configuração base do Axios
 const api = axios.create({
@@ -41,18 +41,17 @@ api.interceptors.response.use(
     }
 
     if (response?.status === 403) {
-      toast.error('Você não tem permissão para realizar esta ação')
+      toastManager.error('Você não tem permissão para realizar esta ação')
       return Promise.reject(error)
     }
 
     if (response?.status >= 500) {
-      toast.error('Erro interno do servidor. Tente novamente mais tarde.')
+      toastManager.error('Erro interno do servidor. Tente novamente mais tarde.')
       return Promise.reject(error)
     }
 
-    // Outros erros
-    const errorMessage = response?.data?.error?.message || 'Erro desconhecido'
-    toast.error(errorMessage)
+    // Para outros erros, não mostrar toast aqui - deixar para o componente decidir
+    // Isso evita toasts duplicados
     
     return Promise.reject(error)
   }

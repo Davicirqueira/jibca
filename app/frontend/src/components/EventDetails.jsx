@@ -7,7 +7,7 @@ import { confirmationService } from '../services/confirmationService'
 import { useAuth } from '../context/AuthContext'
 import LoadingSpinner from './LoadingSpinner'
 import ConfirmationButton from './ConfirmationButton'
-import toast from 'react-hot-toast'
+import { toastManager } from '../utils/ToastManager'
 import { 
   Calendar,
   Clock,
@@ -71,13 +71,13 @@ const EventDetails = () => {
   const handleConfirmationChange = async (status) => {
     try {
       await confirmationService.confirmPresence(id, status)
-      toast.success('Confirmação atualizada com sucesso!')
+      toastManager.success('Confirmação atualizada com sucesso!')
       
       // Recarregar dados
       loadEventDetails()
     } catch (error) {
       console.error('Erro ao atualizar confirmação:', error)
-      toast.error('Erro ao atualizar confirmação')
+      toastManager.error('Erro ao atualizar confirmação')
     }
   }
 
@@ -88,11 +88,11 @@ const EventDetails = () => {
 
     try {
       await eventService.deleteEvent(id)
-      toast.success('Evento excluído com sucesso!')
+      toastManager.success('Evento excluído com sucesso!')
       navigate('/events')
     } catch (error) {
       console.error('Erro ao excluir evento:', error)
-      toast.error('Erro ao excluir evento')
+      toastManager.error('Erro ao excluir evento')
     }
   }
 

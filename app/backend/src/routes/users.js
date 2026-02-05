@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, query } = require('express-validator');
 const UserController = require('../controllers/UserController');
-const { auth, requireRole } = require('../middleware/auth');
+const { auth, requireRole, requireLeaderForDeactivation } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -65,6 +65,6 @@ router.post('/', auth, requireRole('leader'), createUserValidation, UserControll
 router.get('/', auth, requireRole('leader'), listValidation, UserController.list);
 router.get('/:id', auth, requireRole('leader'), UserController.getById);
 router.put('/:id', auth, requireRole('leader'), updateUserValidation, UserController.update);
-router.delete('/:id', auth, requireRole('leader'), UserController.deactivate);
+router.delete('/:id', auth, requireLeaderForDeactivation, UserController.deactivate);
 
 module.exports = router;

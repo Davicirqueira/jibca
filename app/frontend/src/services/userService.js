@@ -4,7 +4,21 @@ export const userService = {
   // Listar usuários/membros (apenas líder)
   async getUsers(params = {}) {
     try {
-      const response = await api.get('/users', { params })
+      // Mapear parâmetros do frontend para backend
+      const backendParams = {
+        ...params,
+        // Mapear 'status' para 'is_active' se necessário
+        is_active: params.status === 'active' ? true : 
+                  params.status === 'inactive' ? false : 
+                  params.is_active
+      };
+      
+      // Remover parâmetro 'status' se foi mapeado
+      if (params.status) {
+        delete backendParams.status;
+      }
+      
+      const response = await api.get('/users', { params: backendParams })
       return response.data.data
     } catch (error) {
       throw error

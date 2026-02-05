@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { userService } from '../services/userService'
 import { useAuth } from '../context/AuthContext'
 import LoadingSpinner from './LoadingSpinner'
-import toast from 'react-hot-toast'
+import { toastManager } from '../utils/ToastManager'
 import { 
   User,
   Mail,
@@ -41,7 +41,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
   // Verificar permissão de líder
   useEffect(() => {
     if (!isLeader()) {
-      toast.error('Acesso negado: Apenas líderes podem gerenciar membros')
+      toastManager.error('Acesso negado: Apenas líderes podem gerenciar membros')
       if (onClose) {
         onClose()
       } else {
@@ -76,7 +76,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
       })
     } catch (error) {
       console.error('Erro ao carregar membro:', error)
-      toast.error('Erro ao carregar dados do membro')
+      toastManager.error('Erro ao carregar dados do membro')
     } finally {
       setLoading(false)
     }
@@ -205,7 +205,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
     e.preventDefault()
     
     if (!validateForm()) {
-      toast.error('Por favor, corrija os erros no formulário')
+      toastManager.error('Por favor, corrija os erros no formulário')
       return
     }
 
@@ -228,10 +228,10 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
       let result
       if (memberId) {
         result = await userService.updateUser(memberId, memberData)
-        toast.success('Membro atualizado com sucesso!')
+        toastManager.success('Membro atualizado com sucesso!')
       } else {
         result = await userService.createUser(memberData)
-        toast.success(`Membro criado com sucesso! Senha inicial: ${generatedPassword}`)
+        toastManager.success(`Membro criado com sucesso! Senha inicial: ${generatedPassword}`)
       }
 
       if (onSuccess) {
@@ -245,12 +245,12 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
       if (error.response?.data?.message) {
         if (error.response.data.message.includes('email')) {
           setErrors({ email: 'Este email já está em uso' })
-          toast.error('Email já está em uso por outro membro')
+          toastManager.error('Email já está em uso por outro membro')
         } else {
-          toast.error(error.response.data.message)
+          toastManager.error(error.response.data.message)
         }
       } else {
-        toast.error(memberId ? 'Erro ao atualizar membro' : 'Erro ao criar membro')
+        toastManager.error(memberId ? 'Erro ao atualizar membro' : 'Erro ao criar membro')
       }
     } finally {
       setLoading(false)

@@ -14,26 +14,31 @@
     "setup": "npm run create-db && npm run migrate && npm run seed",
     "check": "node check-setup.js"
   },
-  "keywords": ["jibca", "agenda", "juventude", "igreja"],
+  "keywords": [
+    "jibca",
+    "agenda",
+    "juventude",
+    "igreja"
+  ],
   "author": "JIBCA",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "pg": "^8.11.3",
     "bcrypt": "^5.1.1",
-    "jsonwebtoken": "^9.0.2",
-    "express-validator": "^7.0.1",
     "cors": "^2.8.5",
-    "helmet": "^7.1.0",
     "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
     "node-cron": "^3.0.3",
-    "node-pg-migrate": "^6.2.2"
+    "node-pg-migrate": "^6.2.2",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2",
+    "fast-check": "^3.15.0",
     "jest": "^29.7.0",
-    "supertest": "^6.3.3",
-    "fast-check": "^3.15.0"
+    "nodemon": "^3.0.2",
+    "supertest": "^6.3.4"
   },
   "engines": {
     "node": ">=18.0.0"

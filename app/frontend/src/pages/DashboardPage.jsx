@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { dashboardService } from '../services/dashboardService'
 import EventCalendar from '../components/EventCalendar'
 import VerseOfTheDay from '../components/VerseOfTheDay'
+import { toastManager } from '../utils/ToastManager'
 import { 
   Calendar, 
   CalendarDays, 
@@ -12,11 +14,48 @@ import {
   TrendingUp,
   Activity,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  RefreshCw,
+  AlertCircle
 } from 'lucide-react'
 
 const DashboardPage = () => {
   const { user, isLeader } = useAuth()
+  const [metrics, setMetrics] = useState({
+    eventsCount: null,
+    membersCount: null,
+    confirmationsCount: null
+  })
+  const [metricsLoading, setMetricsLoading] = useState(true)
+  const [metricsError, setMetricsError] = useState(false)
+
+  // Carregar métricas quando o componente montar
+  useEffect(() => {
+    if (isLeader()) {
+      loadMetrics()
+    }
+  }, [isLeader])
+
+  const loadMetrics = async () => {
+    try {
+      setMetricsLoading(true)
+      setMetricsError(false)
+      
+      const data = await dashboardService.getMetrics()
+      setMetrics(data.metrics)
+      
+    } catch (error) {
+      console.error('Erro ao carregar métricas:', error)
+      setMetricsError(true)
+      toastManager.error('Erro ao carregar métricas do dashboard')
+    } finally {
+      setMetricsLoading(false)
+    }
+  }
+
+  const retryLoadMetrics = () => {
+    loadMetrics()
+  }
 
   const quickActions = [
     {
@@ -178,46 +217,124 @@ const DashboardPage = () => {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-bold text-gray-900">Métricas Operacionais</h2>
-            <div className="text-sm text-gray-500 font-medium">
-              Indicadores de performance do sistema
+            <div className="flex items-center space-x-4">
+              <div className="text-sm text-gray-500 font-medium">
+                Indicadores de performance do sistema
+              </div>
+              {metricsError && (
+                <button
+                  onClick={retryLoadMetrics}
+                  disabled={metricsLoading}
+                  className="flex items-center space-x-2 text-red-600 hover:text-red-700 font-medium transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${metricsLoading ? 'animate-spin' : ''}`} />
+                  <span>Tentar Novamente</span>
+                </button>
+              )}
             </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Eventos Programados */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 group hover:shadow-lg transition-all duration-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="p-3 bg-blue-50 rounded-xl">
                   <Calendar className="w-6 h-6 text-blue-600" />
                 </div>
-                <TrendingUp className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                {!metricsError && (
+                  <TrendingUp className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                )}
+                {metricsError && (
+                  <AlertCircle className="w-5 h-5 text-red-400" />
+                )}
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-1">—</h3>
-              <p className="text-gray-600 font-medium">Eventos Programados</p>
-              <p className="text-xs text-gray-500 mt-2">Aguardando integração de dados</p>
+              
+              {metricsLoading ? (
+                <div className="animate-pulse">
+                  <div className="h-8 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
+              ) : metricsError ? (
+                <>
+                  <h3 className="text-3xl font-bold text-red-500 mb-1">—</h3>
+                  <p className="text-gray-600 font-medium">Eventos Programados</p>
+                  <p className="text-xs text-red-500 mt-2">Erro ao carregar dados</p>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-3xl font-bold text-blue-600 mb-1">{metrics.eventsCount}</h3>
+                  <p className="text-gray-600 font-medium">Eventos Programados</p>
+                  <p className="text-xs text-gray-500 mt-2">Eventos futuros cadastrados</p>
+                </>
+              )}
             </div>
             
+            {/* Membros Ativos */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 group hover:shadow-lg transition-all duration-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="p-3 bg-green-50 rounded-xl">
                   <Users className="w-6 h-6 text-green-600" />
                 </div>
-                <TrendingUp className="w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors" />
+                {!metricsError && (
+                  <TrendingUp className="w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors" />
+                )}
+                {metricsError && (
+                  <AlertCircle className="w-5 h-5 text-red-400" />
+                )}
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-1">—</h3>
-              <p className="text-gray-600 font-medium">Membros Ativos</p>
-              <p className="text-xs text-gray-500 mt-2">Cadastros validados no sistema</p>
+              
+              {metricsLoading ? (
+                <div className="animate-pulse">
+                  <div className="h-8 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
+              ) : metricsError ? (
+                <>
+                  <h3 className="text-3xl font-bold text-red-500 mb-1">—</h3>
+                  <p className="text-gray-600 font-medium">Membros Ativos</p>
+                  <p className="text-xs text-red-500 mt-2">Erro ao carregar dados</p>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-3xl font-bold text-green-600 mb-1">{metrics.membersCount}</h3>
+                  <p className="text-gray-600 font-medium">Membros Ativos</p>
+                  <p className="text-xs text-gray-500 mt-2">Cadastros validados no sistema</p>
+                </>
+              )}
             </div>
             
+            {/* Confirmações Ativas */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 group hover:shadow-lg transition-all duration-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="p-3 bg-purple-50 rounded-xl">
                   <CheckCircle className="w-6 h-6 text-purple-600" />
                 </div>
-                <TrendingUp className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors" />
+                {!metricsError && (
+                  <TrendingUp className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors" />
+                )}
+                {metricsError && (
+                  <AlertCircle className="w-5 h-5 text-red-400" />
+                )}
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-1">—</h3>
-              <p className="text-gray-600 font-medium">Confirmações Ativas</p>
-              <p className="text-xs text-gray-500 mt-2">Participações confirmadas</p>
+              
+              {metricsLoading ? (
+                <div className="animate-pulse">
+                  <div className="h-8 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
+              ) : metricsError ? (
+                <>
+                  <h3 className="text-3xl font-bold text-red-500 mb-1">—</h3>
+                  <p className="text-gray-600 font-medium">Confirmações Ativas</p>
+                  <p className="text-xs text-red-500 mt-2">Erro ao carregar dados</p>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-3xl font-bold text-purple-600 mb-1">{metrics.confirmationsCount}</h3>
+                  <p className="text-gray-600 font-medium">Confirmações Ativas</p>
+                  <p className="text-xs text-gray-500 mt-2">Participações confirmadas</p>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -227,16 +344,17 @@ const DashboardPage = () => {
       <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl p-8 border border-slate-200">
         <div className="text-center max-w-4xl mx-auto">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-              <div className="w-3 h-3 bg-white rounded-full"></div>
-            </div>
+            <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" clipRule="evenodd" />
+              <path d="M8 6h4v2H8V6zM8 10h4v2H8v-2z" />
+            </svg>
           </div>
           <blockquote className="text-2xl text-slate-700 font-medium leading-relaxed mb-6 font-serif">
-            "Porque onde estiverem dois ou três reunidos em meu nome, aí estou eu no meio deles."
+            "Ninguém o despreze pelo fato de você ser jovem"
           </blockquote>
-          <cite className="text-blue-600 font-semibold text-lg">Mateus 18:20</cite>
+          <cite className="text-blue-600 font-semibold text-lg">1 Timóteo 4:12</cite>
           <div className="mt-4 text-sm text-slate-500 font-medium">
-            Fundamento espiritual da comunidade JIBCA
+            Fundamento espiritual da JIBCA - Juventude da Igreja Batista Castro Alves
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@ import { userService } from '../services/userService'
 import { useAuth } from '../context/AuthContext'
 import MemberCard from './MemberCard'
 import LoadingSpinner from './LoadingSpinner'
-import toast from 'react-hot-toast'
+import { toastManager } from '../utils/ToastManager'
 import { 
   Users, 
   Search, 
@@ -69,7 +69,7 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
       }
     } catch (error) {
       console.error('Erro ao carregar membros:', error)
-      toast.error('Erro ao carregar lista de membros')
+      toastManager.error('Erro ao carregar lista de membros')
     } finally {
       setLoading(false)
     }
@@ -79,9 +79,9 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
     try {
       setRefreshing(true)
       await loadMembers()
-      toast.success('Lista de membros atualizada!')
+      toastManager.success('Lista de membros atualizada!')
     } catch (error) {
-      toast.error('Erro ao atualizar lista')
+      toastManager.error('Erro ao atualizar lista')
     } finally {
       setRefreshing(false)
     }
@@ -115,15 +115,15 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
     try {
       if (newStatus) {
         // Reativar membro (implementar quando necessário)
-        toast.info('Funcionalidade de reativação será implementada')
+        toastManager.info('Funcionalidade de reativação será implementada')
       } else {
         await userService.deactivateUser(memberId)
-        toast.success('Membro desativado com sucesso!')
+        toastManager.success('Membro desativado com sucesso!')
         loadMembers() // Recarregar lista
       }
     } catch (error) {
       console.error('Erro ao alterar status do membro:', error)
-      toast.error('Erro ao alterar status do membro')
+      toastManager.error('Erro ao alterar status do membro')
     }
   }
 
