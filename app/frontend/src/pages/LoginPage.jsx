@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { Church, Eye, EyeOff, AlertCircle } from 'lucide-react'
@@ -184,13 +184,13 @@ const LoginPage = () => {
               
               {/* Link Esqueceu Senha */}
               <div className="text-right mt-2">
-                <button
-                  type="button"
+                <Link
+                  to="/forgot-password"
                   className="text-sm font-medium hover:underline transition-colors duration-200"
                   style={{ color: '#8B0000' }}
                 >
                   Esqueceu a senha?
-                </button>
+                </Link>
               </div>
             </div>
 

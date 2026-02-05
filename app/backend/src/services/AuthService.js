@@ -156,19 +156,128 @@ class AuthService {
   }
 
   /**
-   * Gera token de recuperação de senha (futuro)
+   * Gera token de recuperação de senha
    * @param {string} email - Email do usuário
-   * @returns {string} Token de recuperação
+   * @returns {Object} Token e dados do usuário
    */
   static async generateResetToken(email) {
-    // Implementação futura para recuperação de senha
-    const resetToken = jwt.sign(
-      { email, type: 'password_reset' },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+    const PasswordResetRepository = require('../repositories/PasswordResetRepository');
+    
+    try {
+      // Buscar usuário por email
+      const userResult = await query(
+        'SELECT id, name, email, is_active FROM users WHERE email = $1',
+        [email.toLowerCase()]
+      );
 
-    return resetToken;
+      if (userResult.rows.length === 0) {
+        throw new Error('USER_NOT_FOUND');
+      }
+
+      const user = userResult.rows[0];
+
+      // Verificar se usuário está ativo
+      if (!user.is_active) {
+        throw new Error('USER_INACTIVE');
+      }
+
+      // Verificar se já existe token ativo (limite de 3 tokens por hora)
+      const activeTokens = await PasswordResetRepository.countActiveTokens(user.id);
+      if (activeTokens >= 3) {
+        throw new Error('TOO_MANY_REQUESTS');
+      }
+
+      // Criar token de recuperação (válido por 60 minutos)
+      const resetToken = await PasswordResetRepository.create(user.id, 60);
+
+      return {
+        token: resetToken.token,
+        expiresAt: resetToken.expires_at,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email
+        }
+      };
+
+    } catch (error) {
+      console.error('Erro ao gerar token de recuperação:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Valida token de recuperação de senha
+   * @param {string} token - Token de recuperação
+   * @returns {Object} Dados do token e usuário
+   */
+  static async validateResetToken(token) {
+    const PasswordResetRepository = require('../repositories/PasswordResetRepository');
+    
+    try {
+      const resetToken = await PasswordResetRepository.findValidToken(token);
+
+      if (!resetToken) {
+        throw new Error('INVALID_TOKEN');
+      }
+
+      // Verificar se usuário ainda está ativo
+      if (!resetToken.is_active) {
+        throw new Error('USER_INACTIVE');
+      }
+
+      return {
+        userId: resetToken.user_id,
+        email: resetToken.email,
+        name: resetToken.name,
+        expiresAt: resetToken.expires_at
+      };
+
+    } catch (error) {
+      console.error('Erro ao validar token de recuperação:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Redefine senha do usuário usando token
+   * @param {string} token - Token de recuperação
+   * @param {string} newPassword - Nova senha
+   * @returns {Object} Resultado da operação
+   */
+  static async resetPassword(token, newPassword) {
+    const PasswordResetRepository = require('../repositories/PasswordResetRepository');
+    
+    try {
+      // Validar token
+      const tokenData = await this.validateResetToken(token);
+
+      // Gerar hash da nova senha
+      const passwordHash = await this.hashPassword(newPassword);
+
+      // Atualizar senha do usuário
+      await query(
+        'UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+        [passwordHash, tokenData.userId]
+      );
+
+      // Marcar token como usado
+      await PasswordResetRepository.markAsUsed(token);
+
+      // Invalidar todos os outros tokens do usuário
+      await PasswordResetRepository.invalidateUserTokens(tokenData.userId);
+
+      console.log(`✅ Senha redefinida para usuário: ${tokenData.email} (ID: ${tokenData.userId})`);
+
+      return {
+        success: true,
+        email: tokenData.email
+      };
+
+    } catch (error) {
+      console.error('Erro ao redefinir senha:', error);
+      throw error;
+    }
   }
 }
 

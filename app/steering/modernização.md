@@ -1481,24 +1481,45 @@ MIN_PASSWORD_LENGTH=8
 ## ✅ Checklist de Implementação
 
 ### Fase 1 - Correções Críticas (Prioridade Máxima)
-- [ ] Corrigir listagem vazia de eventos
-- [ ] Corrigir criação de eventos (event_type_id)
-- [ ] Corrigir edição de membros
-- [ ] Corrigir edição de perfil
+- [ ] Corrigir edição de perfil (líder & membro) 
+Imagens a serem analisadas: 
+![alt text](image.png)
+![alt text](image-1.png)
+Correções esperadas: Foto de perfil (não consigo colocar)
+Informações do perfil quando alteradas devem ser salvas, e isso não está acontecendo, está ocorrendo erro.
+
+
+- [x] Corrigir listagem vazia de eventos
+- [x] Corrigir criação de eventos (event_type_id)
+- [x] Corrigir edição de membros
+- [x] Corrigir edição de perfil (backend já implementado)
+- [x] Corrigir reativação de membros (frontend)
+- [x] Corrigir ToastManager
+- [x] Corrigir erro ABORTED no console
+- [x] Corrigir checkbox "Membro Ativo" no formulário
 
 ### Fase 2 - Novas Funcionalidades (Alta Prioridade)
-- [ ] Implementar reset de senha (forgot-password)
-- [ ] Implementar reativação de membros
-- [ ] Implementar exclusão permanente de membros
+- [x] Implementar reset de senha (forgot-password) - **COMPLETO**
+  - [x] Criar tabela password_reset_tokens
+  - [x] Criar PasswordResetRepository
+  - [x] Adicionar métodos no AuthService
+  - [x] Criar endpoints no AuthController
+  - [x] Adicionar rotas e validações
+  - [x] Criar página ForgotPassword (frontend)
+  - [x] Criar página ResetPassword (frontend)
+  - [x] Adicionar link no login
+  - [x] Configurar rotas no App.jsx
+- [x] Implementar reativação de membros - **COMPLETO**
+- [x] Implementar exclusão permanente de membros - **COMPLETO (backend)**
 
 ### Fase 3 - Melhorias de Banco (Média Prioridade)
-- [ ] Adicionar índices para performance
-- [ ] Adicionar constraints de integridade
-- [ ] Criar tabela password_reset_tokens
+- [x] Criar tabela password_reset_tokens
+- [ ] Adicionar índices para performance (alguns já existem)
+- [ ] Adicionar constraints de integridade (alguns já existem)
 - [ ] Adicionar unique constraint em confirmations
 
 ### Fase 4 - Segurança (Média Prioridade)
-- [ ] Implementar rate limiting
+- [ ] Implementar rate limiting (middleware express-rate-limit)
 - [ ] Implementar sanitização de inputs
 - [ ] Adicionar validação rigorosa de UUIDs
 - [ ] Implementar logs de auditoria

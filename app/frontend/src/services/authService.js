@@ -73,5 +73,39 @@ export const authService = {
   // Obter token do localStorage
   getStoredToken() {
     return localStorage.getItem('jibca_token')
+  },
+
+  // Solicitar recuperação de senha
+  async forgotPassword(email) {
+    try {
+      const response = await api.post('/auth/forgot-password', { email })
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  // Validar token de recuperação
+  async validateResetToken(token) {
+    try {
+      const response = await api.get(`/auth/validate-reset-token/${token}`)
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  // Redefinir senha
+  async resetPassword(token, newPassword, confirmPassword) {
+    try {
+      const response = await api.post('/auth/reset-password', {
+        token,
+        newPassword,
+        confirmPassword
+      })
+      return response.data
+    } catch (error) {
+      throw error
+    }
   }
 }

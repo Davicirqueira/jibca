@@ -169,6 +169,216 @@ class AuthController {
       });
     }
   }
+
+  /**
+   * Solicitar recuperação de senha
+   * POST /api/v1/auth/forgot-password
+   */
+  static async forgotPassword(req, res) {
+    try {
+      // Verificar erros de validação
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Dados inválidos fornecidos',
+            details: errors.array()
+          }
+        });
+      }
+
+      const { email } = req.body;
+
+      // Gerar token de recuperação
+      const resetData = await AuthService.generateResetToken(email);
+
+      // Em produção, aqui você enviaria um email com o token
+      // Por enquanto, retornamos o token na resposta (apenas para desenvolvimento)
+      const isDevelopment = process.env.NODE_ENV === 'development';
+
+      res.json({
+        success: true,
+        message: 'Se o email existir, um link de recuperação será enviado',
+        data: isDevelopment ? {
+          token: resetData.token,
+          expiresAt: resetData.expiresAt,
+          // URL de exemplo para o frontend
+          resetUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetData.token}`
+        } : undefined
+      });
+
+    } catch (error) {
+      console.error('Erro ao solicitar recuperação de senha:', error);
+
+      // Por segurança, sempre retornar a mesma mensagem
+      // Não revelar se o email existe ou não
+      if (error.message === 'USER_NOT_FOUND' || error.message === 'USER_INACTIVE') {
+        return res.json({
+          success: true,
+          message: 'Se o email existir, um link de recuperação será enviado'
+        });
+      }
+
+      if (error.message === 'TOO_MANY_REQUESTS') {
+        return res.status(429).json({
+          success: false,
+          error: {
+            code: 'TOO_MANY_REQUESTS',
+            message: 'Muitas solicitações de recuperação. Tente novamente em 1 hora.'
+          }
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'FORGOT_PASSWORD_ERROR',
+          message: 'Erro interno ao processar solicitação'
+        }
+      });
+    }
+  }
+
+  /**
+   * Validar token de recuperação
+   * GET /api/v1/auth/validate-reset-token/:token
+   */
+  static async validateResetToken(req, res) {
+    try {
+      const { token } = req.params;
+
+      if (!token) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'TOKEN_REQUIRED',
+            message: 'Token é obrigatório'
+          }
+        });
+      }
+
+      // Validar token
+      const tokenData = await AuthService.validateResetToken(token);
+
+      res.json({
+        success: true,
+        data: {
+          valid: true,
+          email: tokenData.email,
+          expiresAt: tokenData.expiresAt
+        }
+      });
+
+    } catch (error) {
+      console.error('Erro ao validar token:', error);
+
+      if (error.message === 'INVALID_TOKEN') {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_TOKEN',
+            message: 'Token inválido ou expirado'
+          }
+        });
+      }
+
+      if (error.message === 'USER_INACTIVE') {
+        return res.status(401).json({
+          success: false,
+          error: {
+            code: 'USER_INACTIVE',
+            message: 'Usuário desativado'
+          }
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'VALIDATE_TOKEN_ERROR',
+          message: 'Erro interno ao validar token'
+        }
+      });
+    }
+  }
+
+  /**
+   * Redefinir senha
+   * POST /api/v1/auth/reset-password
+   */
+  static async resetPassword(req, res) {
+    try {
+      // Verificar erros de validação
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Dados inválidos fornecidos',
+            details: errors.array()
+          }
+        });
+      }
+
+      const { token, newPassword, confirmPassword } = req.body;
+
+      // Validar se senhas coincidem
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'PASSWORDS_DONT_MATCH',
+            message: 'As senhas não coincidem'
+          }
+        });
+      }
+
+      // Redefinir senha
+      const result = await AuthService.resetPassword(token, newPassword);
+
+      res.json({
+        success: true,
+        message: 'Senha redefinida com sucesso! Você já pode fazer login.',
+        data: {
+          email: result.email
+        }
+      });
+
+    } catch (error) {
+      console.error('Erro ao redefinir senha:', error);
+
+      if (error.message === 'INVALID_TOKEN') {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_TOKEN',
+            message: 'Token inválido ou expirado'
+          }
+        });
+      }
+
+      if (error.message === 'USER_INACTIVE') {
+        return res.status(401).json({
+          success: false,
+          error: {
+            code: 'USER_INACTIVE',
+            message: 'Usuário desativado'
+          }
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'RESET_PASSWORD_ERROR',
+          message: 'Erro interno ao redefinir senha'
+        }
+      });
+    }
+  }
 }
 
 module.exports = AuthController;
