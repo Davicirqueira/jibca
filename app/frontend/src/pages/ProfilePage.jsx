@@ -150,15 +150,38 @@ const ProfilePage = () => {
     try {
       setLoading(true)
       
+      // Preparar dados para atualização (email não pode ser alterado pelo próprio usuário)
       const updateData = {
         name: formData.name.trim(),
-        email: formData.email.trim().toLowerCase(),
         phone: formData.phone.trim() || null
       }
 
+      // Se está alterando senha, usar endpoint separado
       if (showPasswordChange && formData.newPassword) {
-        updateData.currentPassword = formData.currentPassword
-        updateData.newPassword = formData.newPassword
+        // Primeiro atualizar perfil
+        const updatedUser = await userService.updateProfile(updateData)
+        
+        // Depois atualizar senha
+        await userService.updatePassword({
+          currentPassword: formData.currentPassword,
+          newPassword: formData.newPassword,
+          confirmPassword: formData.confirmPassword
+        })
+        
+        // Atualizar contexto
+        updateUser(updatedUser)
+        
+        setIsEditing(false)
+        setShowPasswordChange(false)
+        setFormData(prev => ({
+          ...prev,
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        }))
+        
+        toastManager.success('Perfil e senha atualizados com sucesso!')
+        return
       }
 
       const updatedUser = await userService.updateProfile(updateData)
@@ -356,42 +379,24 @@ const ProfilePage = () => {
                     )}
                   </div>
 
-                  {/* Email */}
+                  {/* Email (somente leitura) */}
                   <div className="space-y-2">
                     <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
                       <Mail className="w-4 h-4 text-blue-600" />
                       <span>Email</span>
-                      <span className="text-red-500">*</span>
+                      <span className="text-gray-400 text-xs">(não editável)</span>
                     </label>
                     <div className="relative">
                       <input
                         type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        onBlur={handleBlur}
-                        className={`w-full px-4 py-3 border rounded-xl text-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 ${
-                          getFieldError('email')
-                            ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                            : isFieldValid('email')
-                            ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                            : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                        }`}
-                        disabled={loading}
+                        value={user?.email}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-500 bg-gray-50 cursor-not-allowed"
+                        disabled
                       />
-                      {isFieldValid('email') && (
-                        <CheckCircle2 className="absolute right-3 top-3 w-5 h-5 text-green-500" />
-                      )}
-                      {getFieldError('email') && (
-                        <AlertCircle className="absolute right-3 top-3 w-5 h-5 text-red-500" />
-                      )}
                     </div>
-                    {getFieldError('email') && (
-                      <p className="text-red-600 text-sm font-medium flex items-center space-x-1">
-                        <AlertCircle className="w-4 h-4" />
-                        <span>{errors.email}</span>
-                      </p>
-                    )}
+                    <p className="text-gray-500 text-xs">
+                      Por segurança, o email não pode ser alterado
+                    </p>
                   </div>
 
                   {/* Telefone */}

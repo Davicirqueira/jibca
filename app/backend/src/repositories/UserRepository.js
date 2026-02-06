@@ -138,7 +138,7 @@ class UserRepository {
    * @returns {Object|null} Usuário atualizado ou null
    */
   static async update(id, updateData) {
-    const allowedFields = ['name', 'email', 'phone', 'avatar_url', 'role'];
+    const allowedFields = ['name', 'email', 'phone', 'avatar_url', 'role', 'password_hash'];
     const updates = [];
     const params = [];
     let paramIndex = 1;

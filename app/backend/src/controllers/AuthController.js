@@ -113,7 +113,12 @@ class AuthController {
             id: user.id,
             name: user.name,
             email: user.email,
-            role: user.role
+            role: user.role,
+            phone: user.phone,
+            avatar_url: user.avatar_url,
+            is_active: user.is_active,
+            created_at: user.created_at,
+            updated_at: user.updated_at
           }
         }
       });
@@ -194,18 +199,44 @@ class AuthController {
       // Gerar token de recuperação
       const resetData = await AuthService.generateResetToken(email);
 
-      // Em produção, aqui você enviaria um email com o token
-      // Por enquanto, retornamos o token na resposta (apenas para desenvolvimento)
+      // Ao invés de enviar email, notificar líderes
+      const NotificationService = require('../services/NotificationService');
+      const UserRepository = require('../repositories/UserRepository');
+
+      // Buscar todos os líderes ativos
+      const leaders = await UserRepository.list({
+        role: 'leader',
+        is_active: true,
+        limit: 100 // Assumindo que não há mais de 100 líderes
+      });
+
+      if (leaders.users && leaders.users.length > 0) {
+        const leaderIds = leaders.users.map(leader => leader.id);
+        
+        // Criar notificação para os líderes
+        const message = `${resetData.user.name} (${email}) solicitou alteração de senha. Acesse o painel administrativo para fazer a alteração.`;
+        
+        await NotificationService.sendCustomNotification(
+          leaderIds,
+          message,
+          'password_reset_request',
+          null
+        );
+
+        console.log(`📬 Notificação de recuperação de senha enviada para ${leaderIds.length} líder(es) - Usuário: ${resetData.user.name} (${email})`);
+      }
+
+      // Em desenvolvimento, retornar informações adicionais
       const isDevelopment = process.env.NODE_ENV === 'development';
 
       res.json({
         success: true,
-        message: 'Se o email existir, um link de recuperação será enviado',
+        message: 'Solicitação de alteração de senha enviada para os líderes. Aguarde o contato.',
         data: isDevelopment ? {
-          token: resetData.token,
-          expiresAt: resetData.expiresAt,
-          // URL de exemplo para o frontend
-          resetUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetData.token}`
+          user: resetData.user.name,
+          email: email,
+          leadersNotified: leaders.users ? leaders.users.length : 0,
+          timestamp: new Date().toISOString()
         } : undefined
       });
 
@@ -217,7 +248,7 @@ class AuthController {
       if (error.message === 'USER_NOT_FOUND' || error.message === 'USER_INACTIVE') {
         return res.json({
           success: true,
-          message: 'Se o email existir, um link de recuperação será enviado'
+          message: 'Solicitação de alteração de senha enviada para os líderes. Aguarde o contato.'
         });
       }
 

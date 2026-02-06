@@ -279,6 +279,24 @@ class AuthService {
       throw error;
     }
   }
+
+  /**
+   * Invalida todos os tokens de recuperação de um usuário
+   * @param {number} userId - ID do usuário
+   * @returns {boolean} Sucesso da operação
+   */
+  static async invalidateUserResetTokens(userId) {
+    const PasswordResetRepository = require('../repositories/PasswordResetRepository');
+    
+    try {
+      await PasswordResetRepository.invalidateUserTokens(userId);
+      console.log(`✅ Tokens de recuperação invalidados para usuário ID: ${userId}`);
+      return true;
+    } catch (error) {
+      console.error('Erro ao invalidar tokens de recuperação:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = AuthService;

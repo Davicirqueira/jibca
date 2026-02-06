@@ -587,6 +587,137 @@ class UserController {
   }
 
   /**
+   * Alterar senha de usuário (apenas líderes)
+   * PUT /api/v1/users/:id/change-password
+   */
+  static async changePassword(req, res) {
+    try {
+      // Verificar erros de validação
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Dados inválidos fornecidos',
+            details: errors.array()
+          }
+        });
+      }
+
+      const { id } = req.params;
+      const { newPassword, confirmPassword } = req.body;
+
+      if (!id || isNaN(parseInt(id))) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_ID',
+            message: 'ID do usuário deve ser um número válido'
+          }
+        });
+      }
+
+      const userId = parseInt(id);
+
+      // Validar se senhas coincidem
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'PASSWORDS_DONT_MATCH',
+            message: 'As senhas não coincidem'
+          }
+        });
+      }
+
+      // Verificar se usuário existe
+      const user = await UserRepository.findById(userId);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          error: {
+            code: 'USER_NOT_FOUND',
+            message: 'Usuário não encontrado'
+          }
+        });
+      }
+
+      // Verificar se usuário está ativo
+      if (!user.is_active) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'USER_INACTIVE',
+            message: 'Não é possível alterar senha de usuário desativado'
+          }
+        });
+      }
+
+      // Gerar hash da nova senha
+      const password_hash = await AuthService.hashPassword(newPassword);
+
+      // Atualizar senha no banco
+      const updatedUser = await UserRepository.update(userId, { password_hash });
+
+      if (!updatedUser) {
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'UPDATE_FAILED',
+            message: 'Falha ao atualizar senha'
+          }
+        });
+      }
+
+      // Invalidar tokens de recuperação existentes (se houver)
+      try {
+        await AuthService.invalidateUserResetTokens(userId);
+      } catch (error) {
+        console.warn('Aviso: Não foi possível invalidar tokens de recuperação:', error.message);
+      }
+
+      console.log(`✅ Senha alterada pelo líder ${req.user.name} para usuário: ${user.name} (${user.email})`);
+
+      // Enviar notificação para o usuário informando sobre a alteração
+      const NotificationService = require('../services/NotificationService');
+      try {
+        await NotificationService.sendCustomNotification(
+          [userId],
+          `Sua senha foi alterada pelo líder ${req.user.name}. Faça login com a nova senha.`,
+          'password_changed',
+          null
+        );
+      } catch (error) {
+        console.warn('Aviso: Não foi possível enviar notificação ao usuário:', error.message);
+      }
+
+      res.json({
+        success: true,
+        message: 'Senha alterada com sucesso',
+        data: {
+          user: {
+            id: updatedUser.id,
+            name: updatedUser.name,
+            email: updatedUser.email
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Erro ao alterar senha:', error);
+      
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'CHANGE_PASSWORD_ERROR',
+          message: 'Erro interno ao alterar senha'
+        }
+      });
+    }
+  }
+
+  /**
    * Obter estatísticas de usuários
    * GET /api/v1/users/stats
    */

@@ -20,7 +20,7 @@ const auth = async (req, res, next) => {
     
     // Buscar usuário no banco para verificar se ainda está ativo
     const userResult = await query(
-      'SELECT id, name, email, role, is_active FROM users WHERE id = $1',
+      'SELECT id, name, email, role, phone, avatar_url, is_active, created_at, updated_at FROM users WHERE id = $1',
       [decoded.userId]
     );
 
@@ -51,7 +51,12 @@ const auth = async (req, res, next) => {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
+      phone: user.phone,
+      avatar_url: user.avatar_url,
+      is_active: user.is_active,
+      created_at: user.created_at,
+      updated_at: user.updated_at
     };
 
     next();

@@ -16,11 +16,16 @@ const updateProfileValidation = [
     .optional()
     .trim()
     .custom((value) => {
-      if (value === '' || value === null) return true; // Permitir limpar telefone
-      const phoneRegex = /^\(\d{2}\)\s?\d{4,5}-?\d{4}$/;
-      if (!phoneRegex.test(value)) {
-        throw new Error('Telefone inválido (formato: (XX) XXXXX-XXXX)');
+      if (value === '' || value === null || value === undefined) return true; // Permitir limpar telefone
+      
+      // Remover todos os caracteres não numéricos para validação
+      const numbersOnly = value.replace(/\D/g, '');
+      
+      // Aceitar telefones com 10 ou 11 dígitos (com ou sem DDD)
+      if (numbersOnly.length < 10 || numbersOnly.length > 11) {
+        throw new Error('Telefone deve ter 10 ou 11 dígitos');
       }
+      
       return true;
     })
 ];
@@ -31,8 +36,7 @@ const updatePasswordValidation = [
     .notEmpty().withMessage('Senha atual é obrigatória'),
   body('newPassword')
     .notEmpty().withMessage('Nova senha é obrigatória')
-    .isLength({ min: 6 }).withMessage('Nova senha deve ter no mínimo 6 caracteres')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/).withMessage('Nova senha deve conter letras maiúsculas, minúsculas e números'),
+    .isLength({ min: 6 }).withMessage('Nova senha deve ter no mínimo 6 caracteres'),
   body('confirmPassword')
     .notEmpty().withMessage('Confirmação de senha é obrigatória')
     .custom((value, { req }) => {

@@ -183,8 +183,7 @@ class EventController {
             hasNext: false,
             hasPrev: false
           }
-        },
-        total: result.events ? result.events.length : 0
+        }
       });
 
     } catch (error) {

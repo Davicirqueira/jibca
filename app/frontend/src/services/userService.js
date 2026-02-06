@@ -88,8 +88,18 @@ export const userService = {
   // Atualizar perfil do usuário logado
   async updateProfile(userData) {
     try {
-      const response = await api.put('/auth/profile', userData)
+      const response = await api.put('/profile', userData)
       return response.data.data.user
+    } catch (error) {
+      throw error
+    }
+  },
+
+  // Atualizar senha do usuário logado
+  async updatePassword(passwordData) {
+    try {
+      const response = await api.put('/profile/password', passwordData)
+      return response.data
     } catch (error) {
       throw error
     }
