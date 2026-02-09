@@ -1,5 +1,10 @@
 const rateLimit = require('express-rate-limit');
 
+// Helper para normalizar IPs IPv6
+const standardIpv6NormalizedKeyGenerator = (req, res) => {
+  return res.locals.standardIpv6NormalizedIp || req.ip;
+};
+
 // Rate limiter geral para todas as rotas
 const generalLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutos
@@ -66,9 +71,10 @@ const resetPasswordLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => {
-    // Usar email como chave para reset de senha (além do IP)
-    return `${req.ip}-${req.body?.email || 'unknown'}`;
+  keyGenerator: (req, res) => {
+    // Usar email como chave para reset de senha (além do IP normalizado para IPv6)
+    const normalizedIp = standardIpv6NormalizedKeyGenerator(req, res);
+    return `${normalizedIp}-${req.body?.email || 'unknown'}`;
   },
   handler: (req, res) => {
     console.warn(`Rate limit de reset password excedido para IP: ${req.ip} - Email: ${req.body?.email || 'N/A'}`);

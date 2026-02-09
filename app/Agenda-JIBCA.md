@@ -85,13 +85,14 @@ A **Agenda JIBCA** é uma plataforma web desenvolvida para facilitar a organiza�
 
 #### Backend
 - **Runtime**: Node.js 18+
-- **Framework**: Express.js
+- **Framework**: Express.js 4.18
 - **Banco de Dados**: PostgreSQL 12+
 - **Autenticação**: JWT (JSON Web Tokens)
 - **Validação**: express-validator
-- **Segurança**: Helmet, bcrypt
+- **Segurança**: Helmet, bcrypt, express-rate-limit
 - **Agendamento**: node-cron
-- **Testes**: Jest, fast-check (property-based testing)
+- **Monitoramento**: nodemon (desenvolvimento)
+- **Testes**: Jest, Supertest, fast-check (property-based testing)
 
 #### Frontend
 - **Framework**: React 18
@@ -228,6 +229,47 @@ Tipos disponíveis:
 - **Duração do Token**: 24 horas (configurável)
 - **Armazenamento**: localStorage no frontend
 - **Refresh**: Automático em requisições
+- **Hashing de Senhas**: bcrypt com salt rounds configurável
+
+### Segurança e Rate Limiting
+
+#### Rate Limiters Implementados
+
+**Rate Limiter Geral:**
+- **Janela**: 15 minutos (configurável via `RATE_LIMIT_WINDOW_MS`)
+- **Limite**: 100 requisições por IP (configurável via `RATE_LIMIT_MAX_REQUESTS`)
+- **Aplicação**: Todas as rotas da API
+
+**Rate Limiter de Autenticação:**
+- **Janela**: 15 minutos
+- **Limite**: 5 tentativas de login (configurável via `AUTH_RATE_LIMIT_MAX`)
+- **Comportamento**: Não conta requisições bem-sucedidas
+- **Proteção**: Previne ataques de força bruta
+
+**Rate Limiter de Recuperação de Senha:**
+- **Janela**: 1 hora
+- **Limite**: 3 solicitações (configurável via `RESET_PASSWORD_RATE_LIMIT_MAX`)
+- **Chave**: Combinação de IP normalizado (IPv6-safe) + email
+- **Proteção**: Previne abuso do sistema de recuperação
+
+**Rate Limiter de Criação de Recursos:**
+- **Janela**: 10 minutos
+- **Limite**: 20 criações
+- **Aplicação**: Endpoints de criação (eventos, membros, etc.)
+
+**Rate Limiter de Operações Sensíveis:**
+- **Janela**: 30 minutos
+- **Limite**: 10 operações
+- **Aplicação**: Exclusões, alterações de senha, desativações
+
+#### Proteções de Segurança
+
+- **Helmet.js**: Headers de segurança HTTP
+- **CORS**: Configurado para aceitar apenas origens confiáveis
+- **SQL Injection**: Proteção via queries parametrizadas (pg)
+- **XSS**: Sanitização de inputs com express-validator
+- **IPv6 Normalização**: Rate limiters com suporte adequado a IPv6
+- **Password Policy**: Senhas hasheadas com bcrypt (10 rounds)
 
 ### Níveis de Permissão
 
@@ -639,19 +681,76 @@ npm run build
 NODE_ENV=production
 PORT=3000
 FRONTEND_URL=https://agenda.jibca.org
+
+# Database
 DB_HOST=seu-host-postgres
 DB_PORT=5432
 DB_NAME=jibca_agenda
 DB_USER=seu-usuario
 DB_PASSWORD=senha-segura
+
+# JWT
 JWT_SECRET=chave-jwt-muito-segura-minimo-32-caracteres
 JWT_EXPIRES_IN=24h
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+AUTH_RATE_LIMIT_MAX=5
+RESET_PASSWORD_RATE_LIMIT_MAX=3
+
+# Notifications
+DAILY_REMINDER_TIME=09:00
+HOURLY_REMINDER_ENABLED=true
+NOTIFICATION_CLEANUP_DAYS=90
 ```
 
 **Frontend (.env.production):**
 ```env
 VITE_API_URL=https://api.agenda.jibca.org/api/v1
 ```
+
+---
+
+## �️ Seguerança e Boas Práticas
+
+### Checklist de Segurança
+
+#### Autenticação e Autorização
+- ✅ Senhas hasheadas com bcrypt (10 rounds)
+- ✅ Tokens JWT com expiração configurável
+- ✅ Validação de permissões em todas as rotas protegidas
+- ✅ Proteção contra força bruta com rate limiting
+
+#### Proteção de API
+- ✅ Rate limiting em múltiplos níveis (geral, auth, reset password, criação, operações sensíveis)
+- ✅ Suporte adequado a IPv6 nos rate limiters
+- ✅ Headers de segurança com Helmet.js
+- ✅ CORS configurado para origens confiáveis
+- ✅ Validação de entrada com express-validator
+
+#### Banco de Dados
+- ✅ Queries parametrizadas (proteção contra SQL injection)
+- ✅ Soft delete para preservar integridade referencial
+- ✅ Índices em campos frequentemente consultados
+- ✅ Backup automático recomendado
+
+#### Dados Sensíveis
+- ✅ Variáveis de ambiente para credenciais
+- ✅ .gitignore configurado para arquivos sensíveis
+- ✅ Logs não expõem informações sensíveis
+- ✅ Senhas nunca retornadas em respostas da API
+
+### Recomendações de Produção
+
+1. **HTTPS Obrigatório**: Configure certificado SSL/TLS
+2. **Firewall**: Restrinja acesso ao banco de dados
+3. **Monitoramento**: Implemente logs centralizados
+4. **Backup**: Configure backup automático diário do banco
+5. **Atualizações**: Mantenha dependências atualizadas
+6. **Secrets**: Use gerenciador de secrets (AWS Secrets Manager, etc.)
+7. **Rate Limiting**: Ajuste limites conforme necessidade
+8. **Auditoria**: Revise logs de segurança regularmente
 
 ---
 
@@ -709,4 +808,30 @@ Para dúvidas ou problemas:
 
 **Última atualização**: Fevereiro 2026
 **Versão**: 1.0.0
-**Status**: Em Desenvolvimento
+**Status**: Em Produção
+
+---
+
+## 📋 Changelog
+
+### v1.0.0 (Fevereiro 2026)
+- ✅ Sistema completo de gestão de eventos
+- ✅ Administração de membros com soft delete
+- ✅ Sistema de notificações automáticas
+- ✅ Dashboard com métricas em tempo real
+- ✅ Calendário interativo
+- ✅ Rate limiting com suporte IPv6
+- ✅ Correções críticas de segurança
+- ✅ Testes automatizados (unitários e property-based)
+- ✅ Documentação completa
+
+### Próximas Funcionalidades (Roadmap)
+- 🔄 Sistema de recuperação de senha por email
+- 🔄 Exportação de relatórios (PDF/Excel)
+- 🔄 Integração com WhatsApp para notificações
+- 🔄 App mobile (React Native)
+- 🔄 Sistema de check-in presencial (QR Code)
+- 🔄 Galeria de fotos de eventos
+- 🔄 Sistema de enquetes e votações
+
+---
