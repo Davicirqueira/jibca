@@ -110,7 +110,7 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
                 )}
               </div>
               <p className="text-xs text-gray-500 font-medium">
-                {formatDate(notification.created_at)}
+                {formatDate(notification.sent_at)}
               </p>
             </div>
           </div>
@@ -132,10 +132,6 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
 
         {/* Conteúdo */}
         <div className="space-y-3">
-          <h4 className={`text-lg font-bold ${isUnread ? 'text-gray-900' : 'text-gray-700'}`}>
-            {notification.title}
-          </h4>
-          
           <p className={`text-sm leading-relaxed ${isUnread ? 'text-gray-800' : 'text-gray-600'}`}>
             {notification.message}
           </p>

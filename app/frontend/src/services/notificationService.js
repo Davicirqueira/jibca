@@ -35,7 +35,7 @@ export const notificationService = {
   async getUnreadCount() {
     try {
       const response = await api.get('/notifications/unread-count')
-      return response.data.data.count
+      return response.data.data.unread_count
     } catch (error) {
       throw error
     }

@@ -53,13 +53,24 @@ const NotificationList = () => {
       
       const params = {
         page: currentPage,
-        limit: itemsPerPage,
-        filter: filter !== 'all' ? filter : undefined
+        limit: itemsPerPage
+      }
+
+      // Backend só suporta filtro de unread_only
+      if (filter === 'unread') {
+        params.unread_only = 'true'
       }
 
       const data = await notificationService.getNotifications(params)
       
-      setNotifications(data.notifications || [])
+      let filteredNotifications = data.notifications || []
+      
+      // Filtrar "read" no frontend (backend não tem esse filtro)
+      if (filter === 'read') {
+        filteredNotifications = filteredNotifications.filter(n => n.read_at !== null)
+      }
+      
+      setNotifications(filteredNotifications)
       setTotalPages(data.pagination?.totalPages || 1)
       setTotalNotifications(data.pagination?.total || 0)
       

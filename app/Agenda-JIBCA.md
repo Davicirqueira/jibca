@@ -793,7 +793,7 @@ Consulte `app/backend/README.md` para lista completa de endpoints da API REST.
 
 ## 📝 Licença
 
-MIT License - JIBCA (Juventude da Igreja Batista Central de Americana)
+MIT License - JIBCA (Juventude da Igreja Batista Castro Alves)
 
 ---
 

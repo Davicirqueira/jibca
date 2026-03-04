@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const EventRepository = require('../repositories/EventRepository');
+const NotificationService = require('../services/NotificationService');
 
 class EventController {
   /**
@@ -106,6 +107,18 @@ class EventController {
 
       // Buscar evento completo para retorno
       const completeEvent = await EventRepository.findById(newEvent.id);
+
+      // Enviar notificações para todos os usuários ativos
+      try {
+        await NotificationService.notifyNewEvent(
+          completeEvent.id,
+          completeEvent.title
+        );
+        console.log(`📬 Notificações enviadas para novo evento: ${completeEvent.title}`);
+      } catch (notificationError) {
+        console.error('⚠️ Erro ao enviar notificações (evento criado com sucesso):', notificationError);
+        // Não falhar a criação do evento se notificações falharem
+      }
 
       res.status(201).json({
         success: true,
@@ -366,6 +379,30 @@ class EventController {
 
       // Buscar evento completo para retorno
       const completeEvent = await EventRepository.findById(eventId);
+
+      // Enviar notificações sobre atualização do evento
+      try {
+        // Criar mensagem descritiva sobre o que foi alterado
+        const changes = [];
+        if (cleanUpdateData.title) changes.push('título');
+        if (cleanUpdateData.date) changes.push('data');
+        if (cleanUpdateData.time) changes.push('horário');
+        if (cleanUpdateData.location) changes.push('local');
+        
+        const updateMessage = changes.length > 0 
+          ? `Alterações: ${changes.join(', ')}`
+          : 'Informações atualizadas';
+
+        await NotificationService.notifyEventUpdate(
+          completeEvent.id,
+          completeEvent.title,
+          updateMessage
+        );
+        console.log(`📬 Notificações de atualização enviadas para evento: ${completeEvent.title}`);
+      } catch (notificationError) {
+        console.error('⚠️ Erro ao enviar notificações (evento atualizado com sucesso):', notificationError);
+        // Não falhar a atualização do evento se notificações falharem
+      }
 
       res.json({
         success: true,

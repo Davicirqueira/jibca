@@ -1,6 +1,6 @@
 # JIBCA Agenda - Backend
 
-Sistema de agenda da Juventude da Igreja Batista Central de Americana.
+Sistema de agenda da Juventude da Igreja Batista Castro Alves.
 
 ## 🚀 Configuração Inicial
 
