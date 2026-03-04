@@ -10,6 +10,7 @@ const confirmationRoutes = require('./routes/confirmations');
 const notificationRoutes = require('./routes/notifications');
 const dashboardRoutes = require('./routes/dashboard');
 const NotificationService = require('./services/NotificationService');
+const EmailService = require('./services/EmailService');
 const { generalLimiter } = require('./middleware/rateLimiter');
 const { sanitizationLogger } = require('./middleware/sanitizer');
 
@@ -170,6 +171,13 @@ app.listen(PORT, async () => {
   console.log(`📅 Ambiente: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔒 Rate limiting ativo: ${generalLimiter ? 'Sim' : 'Não'}`);
   console.log(`🛡️  Helmet security ativo: Sim`);
+  
+  // Inicializar serviço de email
+  try {
+    await EmailService.initialize();
+  } catch (error) {
+    console.error('❌ Erro ao inicializar serviço de email:', error.message);
+  }
   
   // Iniciar agendador de notificações após um pequeno delay
   setTimeout(() => {

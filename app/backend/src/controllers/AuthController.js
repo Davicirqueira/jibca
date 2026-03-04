@@ -199,7 +199,15 @@ class AuthController {
       // Gerar token de recuperação
       const resetData = await AuthService.generateResetToken(email);
 
-      // Ao invés de enviar email, notificar líderes
+      // Enviar email de recuperação
+      const EmailService = require('../services/EmailService');
+      const emailResult = await EmailService.sendPasswordResetEmail(
+        email,
+        resetData.token,
+        resetData.user.name
+      );
+
+      // Notificar líderes sobre a solicitação
       const NotificationService = require('../services/NotificationService');
       const UserRepository = require('../repositories/UserRepository');
 
@@ -207,14 +215,15 @@ class AuthController {
       const leaders = await UserRepository.list({
         role: 'leader',
         is_active: true,
-        limit: 100 // Assumindo que não há mais de 100 líderes
+        limit: 100
       });
 
       if (leaders.users && leaders.users.length > 0) {
         const leaderIds = leaders.users.map(leader => leader.id);
         
-        // Criar notificação para os líderes
-        const message = `${resetData.user.name} (${email}) solicitou alteração de senha. Acesse o painel administrativo para fazer a alteração.`;
+        // Criar notificação para os líderes incluindo status do email
+        const emailStatus = emailResult.success ? 'Email enviado com sucesso' : 'Falha no envio do email';
+        const message = `${resetData.user.name} (${email}) solicitou alteração de senha. ${emailStatus}.`;
         
         await NotificationService.sendCustomNotification(
           leaderIds,
@@ -231,10 +240,11 @@ class AuthController {
 
       res.json({
         success: true,
-        message: 'Solicitação de alteração de senha enviada para os líderes. Aguarde o contato.',
+        message: 'Se o email estiver cadastrado, você receberá um link de recuperação.',
         data: isDevelopment ? {
           user: resetData.user.name,
           email: email,
+          emailSent: emailResult.success,
           leadersNotified: leaders.users ? leaders.users.length : 0,
           timestamp: new Date().toISOString()
         } : undefined
