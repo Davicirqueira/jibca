@@ -42,7 +42,7 @@ const MobileNavigation = () => {
               to={item.href}
               className={`flex flex-col items-center justify-center space-y-1 transition-all duration-200 touch-target ${
                 isActive(item.href)
-                  ? 'text-blue-600 bg-blue-50'
+                  ? 'text-jibca-burgundy bg-jibca-burgundy/10'
                   : 'text-gray-600 hover:text-gray-900 active:bg-gray-100'
               }`}
             >

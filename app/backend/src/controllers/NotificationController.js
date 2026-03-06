@@ -278,6 +278,37 @@ class NotificationController {
   }
 
   /**
+   * Excluir todas as notificações lidas
+   * DELETE /api/v1/notifications/read
+   */
+  static async deleteAllRead(req, res) {
+    try {
+      const userId = req.user.id;
+
+      const deletedCount = await NotificationRepository.deleteAllRead(userId);
+
+      res.json({
+        success: true,
+        data: {
+          deleted_count: deletedCount
+        },
+        message: `${deletedCount} notificação${deletedCount !== 1 ? 'ões' : ''} excluída${deletedCount !== 1 ? 's' : ''} com sucesso`
+      });
+
+    } catch (error) {
+      console.error('Erro ao excluir notificações lidas:', error);
+      
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'DELETE_ALL_READ_ERROR',
+          message: 'Erro interno ao excluir notificações lidas'
+        }
+      });
+    }
+  }
+
+  /**
    * Obter estatísticas de notificações do usuário
    * GET /api/v1/notifications/my-stats
    */

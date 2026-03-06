@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { format, parseISO, isAfter } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { Calendar, Clock, MapPin, User } from 'lucide-react'
 
 const EventCard = ({ event, showConfirmationButton = true, onConfirm }) => {
   const eventDate = parseISO(event.date)
@@ -62,14 +63,14 @@ const EventCard = ({ event, showConfirmationButton = true, onConfirm }) => {
       {/* Event Details */}
       <div className="space-y-2 mb-4">
         <div className="flex items-center text-sm text-gray-600">
-          <span className="mr-2">📅</span>
+          <Calendar className="w-4 h-4 mr-2 text-jibca-burgundy" />
           <span>
             {format(eventDate, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
           </span>
         </div>
         
         <div className="flex items-center text-sm text-gray-600">
-          <span className="mr-2">🕐</span>
+          <Clock className="w-4 h-4 mr-2 text-jibca-burgundy" />
           <span>{event.time}</span>
           {event.duration_minutes && (
             <span className="ml-2 text-gray-500">
@@ -80,14 +81,14 @@ const EventCard = ({ event, showConfirmationButton = true, onConfirm }) => {
         
         {event.location && (
           <div className="flex items-center text-sm text-gray-600">
-            <span className="mr-2">📍</span>
+            <MapPin className="w-4 h-4 mr-2 text-jibca-burgundy" />
             <span>{event.location}</span>
           </div>
         )}
         
         {event.created_by_name && (
           <div className="flex items-center text-sm text-gray-600">
-            <span className="mr-2">👤</span>
+            <User className="w-4 h-4 mr-2 text-gray-500" />
             <span>Criado por {event.created_by_name}</span>
           </div>
         )}
@@ -120,7 +121,7 @@ const EventCard = ({ event, showConfirmationButton = true, onConfirm }) => {
       <div className="flex items-center justify-between pt-4 border-t border-gray-200">
         <Link
           to={`/events/${event.id}`}
-          className="text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
+          className="text-jibca-burgundy hover:text-jibca-burgundyHover font-medium text-sm transition-colors"
         >
           Ver detalhes →
         </Link>

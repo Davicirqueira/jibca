@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { userService } from '../services/userService'
 import LoadingSpinner from '../components/LoadingSpinner'
+import Breadcrumb from '../components/Breadcrumb'
 import { toastManager } from '../utils/ToastManager'
 import { 
   User,
@@ -256,11 +257,17 @@ const ProfilePage = () => {
 
   return (
     <div className="space-y-8">
+      {/* Breadcrumb */}
+      <Breadcrumb 
+        items={[]}
+        current="Meu Perfil"
+      />
+
       {/* Header Corporativo */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-blue-100 rounded-xl">
-            <User className="w-8 h-8 text-blue-600" />
+          <div className="p-3 bg-jibca-burgundy/10 rounded-xl">
+            <User className="w-8 h-8 text-jibca-burgundy" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Meu Perfil</h1>
@@ -297,7 +304,7 @@ const ProfilePage = () => {
                 </span>
               </div>
               {isEditing && (
-                <button className="absolute -bottom-2 -right-2 p-2 bg-blue-600 hover:bg-blue-700 rounded-full text-white transition-colors duration-200">
+                <button className="absolute -bottom-2 -right-2 p-2 bg-jibca-burgundy hover:bg-jibca-burgundyHover rounded-full text-white transition-colors duration-200">
                   <Camera className="w-4 h-4" />
                 </button>
               )}
@@ -336,7 +343,7 @@ const ProfilePage = () => {
               {/* Informações Pessoais */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center space-x-2">
-                  <User className="w-5 h-5 text-blue-600" />
+                  <User className="w-5 h-5 text-jibca-burgundy" />
                   <span>Informações Pessoais</span>
                 </h3>
 
@@ -344,7 +351,7 @@ const ProfilePage = () => {
                   {/* Nome */}
                   <div className="space-y-2">
                     <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-                      <User className="w-4 h-4 text-blue-600" />
+                      <User className="w-4 h-4 text-jibca-gold" />
                       <span>Nome Completo</span>
                       <span className="text-red-500">*</span>
                     </label>
@@ -360,7 +367,7 @@ const ProfilePage = () => {
                             ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                             : isFieldValid('name')
                             ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                            : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                            : 'border-gray-300 focus:ring-jibca-burgundy focus:border-jibca-burgundy'
                         }`}
                         disabled={loading}
                       />
@@ -382,7 +389,7 @@ const ProfilePage = () => {
                   {/* Email (somente leitura) */}
                   <div className="space-y-2">
                     <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-                      <Mail className="w-4 h-4 text-blue-600" />
+                      <Mail className="w-4 h-4 text-jibca-gold" />
                       <span>Email</span>
                       <span className="text-gray-400 text-xs">(não editável)</span>
                     </label>
@@ -402,7 +409,7 @@ const ProfilePage = () => {
                   {/* Telefone */}
                   <div className="space-y-2 md:col-span-2">
                     <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-                      <Phone className="w-4 h-4 text-blue-600" />
+                      <Phone className="w-4 h-4 text-jibca-gold" />
                       <span>Telefone</span>
                       <span className="text-gray-400 text-xs">(opcional)</span>
                     </label>
@@ -419,7 +426,7 @@ const ProfilePage = () => {
                             ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                             : isFieldValid('phone')
                             ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                            : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                            : 'border-gray-300 focus:ring-jibca-burgundy focus:border-jibca-burgundy'
                         }`}
                         disabled={loading}
                       />
@@ -444,12 +451,12 @@ const ProfilePage = () => {
               <div className="border-t border-gray-200 pt-8">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-                    <Lock className="w-5 h-5 text-blue-600" />
+                    <Lock className="w-5 h-5 text-jibca-burgundy" />
                     <span>Segurança</span>
                   </h3>
                   <button
                     onClick={() => setShowPasswordChange(!showPasswordChange)}
-                    className="text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
+                    className="text-jibca-burgundy hover:text-jibca-burgundyHover font-medium text-sm transition-colors"
                   >
                     {showPasswordChange ? 'Cancelar alteração' : 'Alterar senha'}
                   </button>
@@ -468,7 +475,7 @@ const ProfilePage = () => {
                           name="currentPassword"
                           value={formData.currentPassword}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                          className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-jibca-burgundy focus:border-jibca-burgundy transition-all duration-200"
                           disabled={loading}
                         />
                         <button
@@ -499,7 +506,7 @@ const ProfilePage = () => {
                           className={`w-full px-4 py-3 pr-12 border rounded-xl text-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 ${
                             getFieldError('newPassword')
                               ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                              : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                              : 'border-gray-300 focus:ring-jibca-burgundy focus:border-jibca-burgundy'
                           }`}
                           disabled={loading}
                         />
@@ -530,7 +537,7 @@ const ProfilePage = () => {
                         className={`w-full px-4 py-3 border rounded-xl text-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 ${
                           getFieldError('confirmPassword')
                             ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                            : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                            : 'border-gray-300 focus:ring-jibca-burgundy focus:border-jibca-burgundy'
                         }`}
                         disabled={loading}
                       />
@@ -581,7 +588,7 @@ const ProfilePage = () => {
               {/* Informações Pessoais */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center space-x-2">
-                  <User className="w-5 h-5 text-blue-600" />
+                  <User className="w-5 h-5 text-jibca-burgundy" />
                   <span>Informações Pessoais</span>
                 </h3>
 
@@ -627,7 +634,7 @@ const ProfilePage = () => {
               {/* Configurações Rápidas */}
               <div className="border-t border-gray-200 pt-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center space-x-2">
-                  <Settings className="w-5 h-5 text-blue-600" />
+                  <Settings className="w-5 h-5 text-jibca-burgundy" />
                   <span>Configurações</span>
                 </h3>
 
@@ -640,7 +647,7 @@ const ProfilePage = () => {
                         <p className="text-sm text-gray-500">Receber lembretes de eventos</p>
                       </div>
                     </div>
-                    <div className="w-12 h-6 bg-blue-600 rounded-full relative">
+                    <div className="w-12 h-6 bg-jibca-burgundy rounded-full relative">
                       <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5 transition-transform"></div>
                     </div>
                   </div>

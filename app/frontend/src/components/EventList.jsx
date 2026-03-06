@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { RefreshCw } from 'lucide-react';
 import { eventService } from '../services/eventService';
 import { confirmationService } from '../services/confirmationService';
 import { useAuth } from '../context/AuthContext';
@@ -242,7 +243,7 @@ const EventList = ({
             disabled={isLoading}
             className="text-red-600 hover:text-red-700 text-sm font-medium disabled:opacity-50 flex items-center space-x-1"
           >
-            <span className={isLoading ? 'animate-spin' : ''}>🔄</span>
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             <span>{isLoading ? 'Carregando...' : 'Atualizar'}</span>
           </button>
         </div>

@@ -3,6 +3,7 @@ import { userService } from '../services/userService'
 import { useAuth } from '../context/AuthContext'
 import MemberCard from './MemberCard'
 import LoadingSpinner from './LoadingSpinner'
+import ConfirmationModal from './ConfirmationModal'
 import { toastManager } from '../utils/ToastManager'
 import { 
   Users, 
@@ -30,6 +31,8 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalMembers, setTotalMembers] = useState(0)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [memberToDelete, setMemberToDelete] = useState(null)
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
@@ -131,6 +134,26 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
     }
   }
 
+  const handleDeleteMember = (member) => {
+    setMemberToDelete(member)
+    setShowDeleteModal(true)
+  }
+
+  const confirmDeleteMember = async () => {
+    if (!memberToDelete) return
+
+    try {
+      await userService.deleteMemberPermanently(memberToDelete.id)
+      toastManager.success('Membro excluído permanentemente com sucesso!')
+      setMemberToDelete(null)
+      loadMembers() // Recarregar lista
+    } catch (error) {
+      console.error('Erro ao excluir membro:', error)
+      const errorMessage = error.response?.data?.error?.message || 'Erro ao excluir membro'
+      toastManager.error(errorMessage)
+    }
+  }
+
   const handlePageChange = (page) => {
     setCurrentPage(page)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -164,8 +187,8 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
       {/* Header Corporativo */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-blue-100 rounded-xl">
-            <Users className="w-8 h-8 text-blue-600" />
+          <div className="p-3 bg-jibca-burgundy/10 rounded-xl">
+            <Users className="w-8 h-8 text-jibca-burgundy" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
@@ -190,7 +213,7 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
           {showCreateButton && onCreateMember && (
             <button
               onClick={onCreateMember}
-              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105"
+              className="flex items-center space-x-2 bg-jibca-burgundy hover:bg-jibca-burgundyHover text-white px-6 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105"
             >
               <UserPlus className="w-4 h-4" />
               <span>Novo Membro</span>
@@ -203,8 +226,8 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-all duration-200">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-blue-50 rounded-xl">
-              <Users className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-jibca-burgundy/10 rounded-xl">
+              <Users className="w-6 h-6 text-jibca-burgundy" />
             </div>
           </div>
           <h3 className="text-3xl font-bold text-gray-900 mb-1">{filteredStats.total}</h3>
@@ -254,7 +277,7 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
                 placeholder="Buscar por nome ou email..."
                 value={searchTerm}
                 onChange={handleSearch}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-jibca-burgundy focus:border-jibca-burgundy transition-all duration-200"
               />
             </div>
           </div>
@@ -276,7 +299,7 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
                     onClick={() => handleStatusFilter(option.key)}
                     className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
                       statusFilter === option.key
-                        ? 'bg-white text-blue-600 shadow-sm'
+                        ? 'bg-white text-jibca-burgundy shadow-sm'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
@@ -301,7 +324,7 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
                     onClick={() => handleRoleFilter(option.key)}
                     className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
                       roleFilter === option.key
-                        ? 'bg-white text-blue-600 shadow-sm'
+                        ? 'bg-white text-jibca-burgundy shadow-sm'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
@@ -336,7 +359,7 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
           {showCreateButton && onCreateMember && (
             <button
               onClick={onCreateMember}
-              className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200"
+              className="inline-flex items-center space-x-2 bg-jibca-burgundy hover:bg-jibca-burgundyHover text-white px-6 py-3 rounded-xl font-medium transition-all duration-200"
             >
               <Plus className="w-4 h-4" />
               <span>Adicionar Primeiro Membro</span>
@@ -353,6 +376,7 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
                 member={member}
                 onEdit={onEditMember}
                 onToggleStatus={handleToggleMemberStatus}
+                onDelete={handleDeleteMember}
                 isLeader={isLeader()}
               />
             ))}
@@ -394,7 +418,7 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
                         onClick={() => handlePageChange(pageNum)}
                         className={`w-10 h-10 rounded-lg text-sm font-medium transition-all duration-200 ${
                           currentPage === pageNum
-                            ? 'bg-blue-600 text-white'
+                            ? 'bg-jibca-burgundy text-white'
                             : 'text-gray-700 hover:bg-gray-100'
                         }`}
                       >
@@ -417,6 +441,21 @@ const MemberList = ({ onCreateMember, onEditMember, showCreateButton = true }) =
           )}
         </>
       )}
+
+      {/* Modal de Confirmação de Exclusão */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false)
+          setMemberToDelete(null)
+        }}
+        onConfirm={confirmDeleteMember}
+        title="Excluir Membro Permanentemente"
+        message={`Tem certeza que deseja excluir permanentemente o membro "${memberToDelete?.name}"? Esta ação não pode ser desfeita e todos os dados relacionados (confirmações, histórico) serão perdidos.`}
+        confirmText="Sim, Excluir Permanentemente"
+        cancelText="Cancelar"
+        type="danger"
+      />
     </div>
   )
 }

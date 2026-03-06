@@ -199,7 +199,7 @@ const ResetPassword = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-jibca-darkBrown via-jibca-darkerBrown to-jibca-darkBrown flex items-center justify-center">
         <div className="text-center">
           <LoadingSpinner size="large" />
           <p className="text-white mt-4 font-medium">Validando token...</p>
@@ -215,21 +215,21 @@ const ResetPassword = () => {
   const passwordStrength = formData.newPassword ? getPasswordStrength(formData.newPassword) : null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-jibca-darkBrown via-jibca-darkerBrown to-jibca-darkBrown flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Card Principal */}
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-8 text-white">
+          <div className="bg-gradient-to-r from-jibca-burgundy to-jibca-burgundyPressed p-8 text-white">
             <div className="flex items-center justify-center mb-4">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <Lock className="w-8 h-8" />
+              <div className="w-16 h-16 bg-jibca-gold/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <Lock className="w-8 h-8 text-jibca-gold" />
               </div>
             </div>
             <h1 className="text-3xl font-bold text-center mb-2">
               Nova Senha
             </h1>
-            <p className="text-blue-100 text-center text-sm">
+            <p className="text-jibca-gold/90 text-center text-sm">
               Defina uma senha forte para sua conta
             </p>
           </div>
@@ -238,8 +238,8 @@ const ResetPassword = () => {
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
             {/* Info do Usuário */}
             {tokenData?.email && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <p className="text-blue-800 text-sm text-center">
+              <div className="bg-jibca-gold/10 border border-jibca-gold/30 rounded-xl p-4">
+                <p className="text-gray-800 text-sm text-center">
                   Redefinindo senha para: <strong>{tokenData.email}</strong>
                 </p>
               </div>
@@ -248,7 +248,7 @@ const ResetPassword = () => {
             {/* Nova Senha */}
             <div className="space-y-2">
               <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-                <Key className="w-4 h-4 text-blue-600" />
+                <Key className="w-4 h-4 text-jibca-burgundy" />
                 <span>Nova Senha</span>
               </label>
               <div className="relative">
@@ -262,7 +262,7 @@ const ResetPassword = () => {
                   className={`w-full px-4 py-3 pr-12 border rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 ${
                     errors.newPassword
                       ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                      : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                      : 'border-gray-300 focus:ring-jibca-burgundy focus:border-jibca-burgundy'
                   }`}
                   disabled={submitting}
                   autoFocus
@@ -330,7 +330,7 @@ const ResetPassword = () => {
             {/* Confirmar Senha */}
             <div className="space-y-2">
               <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-                <Key className="w-4 h-4 text-blue-600" />
+                <Key className="w-4 h-4 text-jibca-burgundy" />
                 <span>Confirmar Senha</span>
               </label>
               <div className="relative">
@@ -346,7 +346,7 @@ const ResetPassword = () => {
                       ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                       : formData.confirmPassword && formData.confirmPassword === formData.newPassword
                       ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                      : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                      : 'border-gray-300 focus:ring-jibca-burgundy focus:border-jibca-burgundy'
                   }`}
                   disabled={submitting}
                 />
@@ -372,7 +372,7 @@ const ResetPassword = () => {
             {/* Botão Submit */}
             <button
               type="submit"
-              className="flex items-center justify-center space-x-2 w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="flex items-center justify-center space-x-2 w-full bg-jibca-burgundy hover:bg-jibca-burgundyHover text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               disabled={submitting || Object.keys(errors).length > 0}
             >
               {submitting ? (

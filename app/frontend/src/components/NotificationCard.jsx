@@ -9,10 +9,11 @@ import {
   CheckCircle,
   Clock,
   Eye,
-  EyeOff
+  EyeOff,
+  Trash2
 } from 'lucide-react'
 
-const NotificationCard = ({ notification, onMarkAsRead }) => {
+const NotificationCard = ({ notification, onMarkAsRead, onDelete }) => {
   const isUnread = !notification.read_at
 
   const getNotificationIcon = (type) => {
@@ -37,7 +38,7 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
       case 'event_reminder':
         return 'bg-yellow-100 text-yellow-600'
       case 'event_created':
-        return 'bg-blue-100 text-blue-600'
+        return 'bg-jibca-burgundy/10 text-jibca-burgundy'
       case 'event_updated':
         return 'bg-purple-100 text-purple-600'
       case 'member_joined':
@@ -89,7 +90,7 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
   return (
     <div 
       className={`bg-white rounded-2xl shadow-sm border transition-all duration-200 hover:shadow-lg transform hover:scale-[1.01] cursor-pointer ${
-        isUnread ? 'border-blue-200 bg-blue-50/30' : 'border-gray-100'
+        isUnread ? 'border-jibca-burgundy/30 bg-jibca-burgundy/5' : 'border-gray-100'
       }`}
       onClick={handleMarkAsRead}
     >
@@ -102,11 +103,11 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h3 className={`text-sm font-semibold ${isUnread ? 'text-blue-900' : 'text-gray-900'}`}>
+                <h3 className={`text-sm font-semibold ${isUnread ? 'text-jibca-burgundy' : 'text-gray-900'}`}>
                   {getTypeLabel(notification.type)}
                 </h3>
                 {isUnread && (
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-jibca-burgundy rounded-full animate-pulse"></div>
                 )}
               </div>
               <p className="text-xs text-gray-500 font-medium">
@@ -117,7 +118,7 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
 
           <div className="flex items-center space-x-2">
             {isUnread ? (
-              <div className="flex items-center space-x-1 text-blue-600">
+              <div className="flex items-center space-x-1 text-jibca-burgundy">
                 <EyeOff className="w-4 h-4" />
                 <span className="text-xs font-medium">Não lida</span>
               </div>
@@ -127,6 +128,18 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
                 <span className="text-xs font-medium">Lida</span>
               </div>
             )}
+            
+            {/* Botão Deletar */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                if (onDelete) onDelete(notification.id)
+              }}
+              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+              title="Remover notificação"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
@@ -164,7 +177,7 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
                   e.stopPropagation()
                   handleMarkAsRead()
                 }}
-                className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-xs font-medium transition-colors"
+                className="flex items-center space-x-1 text-jibca-burgundy hover:text-jibca-burgundyHover text-xs font-medium transition-colors"
               >
                 <CheckCircle className="w-3 h-3" />
                 <span>Marcar como lida</span>

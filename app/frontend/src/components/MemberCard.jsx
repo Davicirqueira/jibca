@@ -10,10 +10,11 @@ import {
   UserCheck,
   UserX,
   Edit3,
-  MoreVertical
+  MoreVertical,
+  Trash2
 } from 'lucide-react'
 
-const MemberCard = ({ member, onEdit, onToggleStatus, isLeader }) => {
+const MemberCard = ({ member, onEdit, onToggleStatus, onDelete, isLeader }) => {
   const isActive = member.active !== false && member.active !== 0
 
   const handleToggleStatus = () => {
@@ -28,8 +29,14 @@ const MemberCard = ({ member, onEdit, onToggleStatus, isLeader }) => {
     }
   }
 
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(member)
+    }
+  }
+
   const getRoleColor = (role) => {
-    return role === 'leader' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+    return role === 'leader' ? 'bg-purple-100 text-purple-700' : 'bg-jibca-burgundy/10 text-jibca-burgundy'
   }
 
   const getRoleIcon = (role) => {
@@ -45,7 +52,7 @@ const MemberCard = ({ member, onEdit, onToggleStatus, isLeader }) => {
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-4">
             <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
-              isActive ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'
+              isActive ? 'bg-jibca-burgundy/10 text-jibca-burgundy' : 'bg-gray-100 text-gray-500'
             }`}>
               {member.name.charAt(0).toUpperCase()}
             </div>
@@ -84,7 +91,7 @@ const MemberCard = ({ member, onEdit, onToggleStatus, isLeader }) => {
             <div className="flex items-center space-x-2">
               <button
                 onClick={handleEdit}
-                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                className="p-2 text-gray-400 hover:text-jibca-burgundy hover:bg-jibca-burgundy/10 rounded-lg transition-all duration-200"
                 title="Editar membro"
               >
                 <Edit3 className="w-4 h-4" />
@@ -106,6 +113,14 @@ const MemberCard = ({ member, onEdit, onToggleStatus, isLeader }) => {
                       }`}
                     >
                       {isActive ? 'Desativar Membro' : 'Reativar Membro'}
+                    </button>
+                    <div className="my-1 border-t border-gray-100"></div>
+                    <button
+                      onClick={handleDelete}
+                      className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors duration-200 flex items-center space-x-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span>Excluir Permanentemente</span>
                     </button>
                   </div>
                 </div>
@@ -163,7 +178,7 @@ const MemberCard = ({ member, onEdit, onToggleStatus, isLeader }) => {
             <div className="grid grid-cols-2 gap-4 text-center">
               {member.events_participated && (
                 <div>
-                  <p className="text-lg font-bold text-blue-600">{member.events_participated}</p>
+                  <p className="text-lg font-bold text-jibca-burgundy">{member.events_participated}</p>
                   <p className="text-xs text-gray-500 font-medium">Eventos Participados</p>
                 </div>
               )}

@@ -4,11 +4,28 @@
 
 /* Estilos customizados para o tema JIBCA */
 :root {
+  /* JIBCA Browns (Backgrounds) */
+  --jibca-dark-brown: #2D1810;
+  --jibca-darker-brown: #1A0F0A;
+  
+  /* JIBCA Golds (Accents & Highlights) */
+  --jibca-gold: #D4C4B0;
+  --jibca-gold-light: #E8DCC8;
+  --jibca-gold-dark: #B8A890;
+  
+  /* JIBCA Burgundy (Primary Actions) */
+  --jibca-burgundy: #8B0000;
+  --jibca-burgundy-hover: #A52A2A;
+  --jibca-burgundy-pressed: #6B0000;
+  
+  /* Legacy support (keeping for backward compatibility) */
   --primary-darkred: #8B0000;
   --primary-darkred-hover: #A52A2A;
   --primary-darkred-pressed: #6B0000;
   --primary-darkred-light: rgba(139,0,0,0.1);
   --primary-darkred-lighter: rgba(139,0,0,0.05);
+  
+  /* Functional colors (keep for status indicators) */
   --primary-green: #059669;
   --primary-yellow: #d97706;
   --primary-purple: #8b5cf6;
@@ -773,4 +790,34 @@ body {
 
 .connection-slow {
   @apply bg-yellow-100 text-yellow-800 border border-yellow-200;
+}
+
+
+/* Animações para Modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.3s ease-out;
 }

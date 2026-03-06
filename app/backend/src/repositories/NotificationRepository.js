@@ -205,6 +205,20 @@ class NotificationRepository {
   }
 
   /**
+   * Excluir todas as notificações lidas de um usuário
+   * @param {number} userId - ID do usuário
+   * @returns {number} Número de notificações excluídas
+   */
+  static async deleteAllRead(userId) {
+    const result = await query(
+      'DELETE FROM notifications WHERE user_id = $1 AND read_at IS NOT NULL',
+      [userId]
+    );
+
+    return result.rowCount;
+  }
+
+  /**
    * Buscar notificações por evento
    * @param {number} eventId - ID do evento
    * @returns {Array} Lista de notificações do evento

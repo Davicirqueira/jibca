@@ -75,6 +75,16 @@ export const userService = {
     }
   },
 
+  // Deletar membro permanentemente (apenas líder)
+  async deleteMemberPermanently(id) {
+    try {
+      await api.delete(`/users/${id}/permanent`)
+      return true
+    } catch (error) {
+      throw error
+    }
+  },
+
   // Obter estatísticas de usuários (apenas líder)
   async getUserStats() {
     try {

@@ -8,19 +8,33 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
+          50: '#FEF2F2',
+          100: '#FEE2E2',
+          200: '#FECACA',
+          300: '#FCA5A5',
+          400: '#F87171',
+          500: '#8B0000',  // Changed from blue to JIBCA burgundy
+          600: '#6B0000',  // Changed from blue to JIBCA burgundy pressed
+          700: '#5B0000',
+          800: '#4B0000',
+          900: '#3B0000',
         },
         jibca: {
-          blue: '#3B82F6',
+          // JIBCA Browns (Backgrounds)
+          darkBrown: '#2D1810',
+          darkerBrown: '#1A0F0A',
+          
+          // JIBCA Golds (Accents & Highlights)
+          gold: '#D4C4B0',
+          goldLight: '#E8DCC8',
+          goldDark: '#B8A890',
+          
+          // JIBCA Burgundy (Primary Actions)
+          burgundy: '#8B0000',
+          burgundyHover: '#A52A2A',
+          burgundyPressed: '#6B0000',
+          
+          // Functional colors (keep for event types and status)
           green: '#10B981',
           yellow: '#F59E0B',
           purple: '#8B5CF6',

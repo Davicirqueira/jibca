@@ -55,6 +55,7 @@ router.get('/health', auth, requireRole('leader'), NotificationController.getHea
 router.get('/', auth, listValidation, NotificationController.list);
 router.put('/read-all', auth, NotificationController.markAllAsRead);
 router.put('/:id/read', auth, NotificationController.markAsRead);
+router.delete('/read', auth, NotificationController.deleteAllRead);
 router.delete('/:id', auth, NotificationController.delete);
 
 // Rotas administrativas (apenas Líder)

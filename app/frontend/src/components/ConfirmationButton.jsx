@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { CheckCircle, XCircle, HelpCircle } from 'lucide-react'
 import LoadingSpinner from './LoadingSpinner'
 
 const ConfirmationButton = ({ eventId, currentStatus, onConfirmationChange }) => {
@@ -50,13 +51,26 @@ const ConfirmationButton = ({ eventId, currentStatus, onConfirmationChange }) =>
       </h3>
       
       {currentStatus && (
-        <div className="text-sm text-gray-600 mb-4">
-          Status atual: 
-          <span className="ml-2 font-medium">
-            {currentStatus === 'confirmed' && '✅ Confirmado'}
-            {currentStatus === 'declined' && '❌ Não vou'}
-            {currentStatus === 'maybe' && '❓ Talvez'}
-          </span>
+        <div className="text-sm text-gray-600 mb-4 flex items-center space-x-2">
+          <span>Status atual:</span>
+          {currentStatus === 'confirmed' && (
+            <span className="flex items-center space-x-1 font-medium text-green-600">
+              <CheckCircle className="w-4 h-4" />
+              <span>Confirmado</span>
+            </span>
+          )}
+          {currentStatus === 'declined' && (
+            <span className="flex items-center space-x-1 font-medium text-red-600">
+              <XCircle className="w-4 h-4" />
+              <span>Não vou</span>
+            </span>
+          )}
+          {currentStatus === 'maybe' && (
+            <span className="flex items-center space-x-1 font-medium text-yellow-600">
+              <HelpCircle className="w-4 h-4" />
+              <span>Talvez</span>
+            </span>
+          )}
         </div>
       )}
 
@@ -70,7 +84,7 @@ const ConfirmationButton = ({ eventId, currentStatus, onConfirmationChange }) =>
             <LoadingSpinner size="small" />
           ) : (
             <>
-              <span>✅</span>
+              <CheckCircle className="w-5 h-5" />
               <span>Vou participar</span>
             </>
           )}
@@ -85,7 +99,7 @@ const ConfirmationButton = ({ eventId, currentStatus, onConfirmationChange }) =>
             <LoadingSpinner size="small" />
           ) : (
             <>
-              <span>❓</span>
+              <HelpCircle className="w-5 h-5" />
               <span>Talvez</span>
             </>
           )}
@@ -100,7 +114,7 @@ const ConfirmationButton = ({ eventId, currentStatus, onConfirmationChange }) =>
             <LoadingSpinner size="small" />
           ) : (
             <>
-              <span>❌</span>
+              <XCircle className="w-5 h-5" />
               <span>Não vou</span>
             </>
           )}

@@ -1,6 +1,7 @@
 import React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import MemberForm from '../components/MemberForm'
+import Breadcrumb from '../components/Breadcrumb'
 
 const EditMemberPage = () => {
   const { id } = useParams()
@@ -17,6 +18,13 @@ const EditMemberPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
+      <Breadcrumb 
+        items={[
+          { label: 'Membros', href: '/members' }
+        ]}
+        current="Editar Membro"
+      />
+      
       <MemberForm 
         memberId={id}
         onSuccess={handleSuccess}

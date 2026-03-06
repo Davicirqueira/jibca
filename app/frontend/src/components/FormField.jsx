@@ -32,7 +32,7 @@ const FormField = ({
     } else if (isValid) {
       return `${baseClasses} border-green-300 focus:ring-green-500 focus:border-green-500`
     } else {
-      return `${baseClasses} border-gray-300 focus:ring-blue-500 focus:border-blue-500`
+      return `${baseClasses} border-gray-300 focus:ring-jibca-burgundy focus:border-jibca-burgundy`
     }
   }
 
@@ -99,7 +99,7 @@ const FormField = ({
     <div className={`space-y-2 ${className}`}>
       {/* Label */}
       <label htmlFor={fieldId} className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-        {Icon && <Icon className="w-4 h-4 text-blue-600" />}
+        {Icon && <Icon className="w-4 h-4 text-jibca-gold" />}
         <span>{label}</span>
         {required && <span className="text-red-500">*</span>}
       </label>

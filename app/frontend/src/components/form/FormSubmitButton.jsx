@@ -83,7 +83,7 @@ const FormSubmitButton = ({
       {/* Mensagem de status */}
       {getStatusMessage() && (
         <p className={`text-sm text-center mt-2 ${
-          showRetryHint ? 'text-blue-600' : 
+          showRetryHint ? 'text-jibca-burgundy' : 
           hasErrors ? 'text-red-600' : 'text-gray-500'
         }`}>
           {getStatusMessage()}

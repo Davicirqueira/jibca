@@ -31,6 +31,26 @@ export const notificationService = {
     }
   },
 
+  // Deletar uma notificação
+  async deleteNotification(notificationId) {
+    try {
+      await api.delete(`/notifications/${notificationId}`)
+      return true
+    } catch (error) {
+      throw error
+    }
+  },
+
+  // Deletar todas as notificações lidas
+  async deleteAllRead() {
+    try {
+      await api.delete('/notifications/read')
+      return true
+    } catch (error) {
+      throw error
+    }
+  },
+
   // Obter contagem de notificações não lidas
   async getUnreadCount() {
     try {

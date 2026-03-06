@@ -228,7 +228,7 @@ class AuthController {
         await NotificationService.sendCustomNotification(
           leaderIds,
           message,
-          'password_reset_request',
+          'new_event',
           null
         );
 

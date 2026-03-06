@@ -174,7 +174,7 @@ const EventForm = ({ eventId = null, onClose = null, onSuccess = null }) => {
     <div className="max-w-4xl mx-auto p-6">
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-red-900 to-red-800 px-8 py-6">
+        <div className="bg-gradient-to-r from-jibca-burgundy to-jibca-burgundyPressed px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-white">

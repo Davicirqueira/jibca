@@ -257,7 +257,7 @@ const EventCalendar = ({ onEventClick, showCreateButton = false, onCreateEvent }
           {selectedDate && (
             <div className="mt-8 pt-6 border-t border-gray-200">
               <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                <CalendarIcon className="w-5 h-5 text-blue-600" />
+                <CalendarIcon className="w-5 h-5 text-jibca-burgundy" />
                 <span>Eventos de {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}</span>
               </h3>
               
@@ -293,7 +293,7 @@ const EventCalendar = ({ onEventClick, showCreateButton = false, onCreateEvent }
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2 text-blue-600">
+                        <div className="flex items-center space-x-2 text-jibca-burgundy hover:text-jibca-burgundyHover transition-colors">
                           <span className="text-sm font-medium">Visualizar</span>
                           <ArrowRight className="w-4 h-4" />
                         </div>

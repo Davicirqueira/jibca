@@ -113,7 +113,7 @@ const VerseOfTheDay = () => {
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full mx-4 animate-fade-in border border-gray-100">
         {/* Header Corporativo */}
-        <div className="relative bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white p-8 rounded-t-3xl">
+        <div className="relative bg-gradient-to-r from-jibca-darkBrown via-jibca-darkerBrown to-jibca-darkBrown text-white p-8 rounded-t-3xl">
           <button
             onClick={handleClose}
             className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-full transition-colors duration-200"
@@ -122,11 +122,11 @@ const VerseOfTheDay = () => {
           </button>
           
           <div className="text-center">
-            <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-              <Heart className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 bg-jibca-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+              <Heart className="w-8 h-8 text-jibca-gold" />
             </div>
             <h2 className="text-2xl font-bold mb-2">Versículo do Dia</h2>
-            <p className="text-slate-200 text-sm font-medium">
+            <p className="text-jibca-gold/90 text-sm font-medium">
               Reflexão Espiritual Diária
             </p>
           </div>
@@ -135,8 +135,8 @@ const VerseOfTheDay = () => {
         {/* Conteúdo */}
         <div className="p-8">
           <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-jibca-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-6 h-6 text-jibca-gold" />
             </div>
           </div>
 
@@ -145,14 +145,14 @@ const VerseOfTheDay = () => {
           </blockquote>
           
           <div className="text-center mb-6">
-            <cite className="text-blue-600 font-bold text-lg">
+            <cite className="text-jibca-burgundy font-bold text-lg">
               {currentVerse.reference}
             </cite>
           </div>
 
           {/* Elementos decorativos */}
           <div className="flex justify-center space-x-2 mb-6">
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-jibca-gold rounded-full animate-pulse"></div>
             <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
             <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
           </div>
@@ -160,7 +160,7 @@ const VerseOfTheDay = () => {
           <div className="text-center">
             <button
               onClick={handleClose}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-2xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg"
+              className="bg-gradient-to-r from-jibca-burgundy to-jibca-burgundyPressed hover:from-jibca-burgundyHover hover:to-jibca-burgundy text-white px-8 py-3 rounded-2xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
               Continuar
             </button>

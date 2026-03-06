@@ -57,15 +57,15 @@ const Layout = ({ children }) => {
             {/* Logo Corporativo */}
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-3 group">
-                <div className="p-2 bg-blue-600 rounded-xl group-hover:bg-blue-700 transition-all duration-200 shadow-sm">
-                  <Church className="w-6 h-6 text-white" />
+                <div className="p-2 bg-jibca-burgundy rounded-xl group-hover:bg-jibca-burgundyHover transition-all duration-200 shadow-sm">
+                  <Church className="w-6 h-6 text-jibca-gold" />
                 </div>
                 <div className="hidden sm:block">
-                  <h1 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
+                  <h1 className="text-xl font-bold text-gray-900 group-hover:text-jibca-burgundy transition-colors duration-200">
                     JIBCA
                   </h1>
                   <p className="text-xs text-gray-500 font-medium">
-                    Sistema de Agenda
+                    Agenda
                   </p>
                 </div>
               </Link>
@@ -149,7 +149,7 @@ const Layout = ({ children }) => {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-base font-medium transition-all duration-200 mobile-nav-item ${
                       isActive(item.href)
-                        ? 'bg-blue-50 text-blue-700'
+                        ? 'bg-jibca-burgundy/10 text-jibca-burgundy'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >

@@ -7,6 +7,8 @@ import { confirmationService } from '../services/confirmationService'
 import { useAuth } from '../context/AuthContext'
 import LoadingSpinner from './LoadingSpinner'
 import ConfirmationButton from './ConfirmationButton'
+import Breadcrumb from './Breadcrumb'
+import ConfirmationModal from './ConfirmationModal'
 import { toastManager } from '../utils/ToastManager'
 import { 
   Calendar,
@@ -33,6 +35,7 @@ const EventDetails = () => {
   const [myConfirmation, setMyConfirmation] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   useEffect(() => {
     loadEventDetails()
@@ -81,11 +84,11 @@ const EventDetails = () => {
     }
   }
 
-  const handleDeleteEvent = async () => {
-    if (!window.confirm('Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.')) {
-      return
-    }
+  const handleDeleteEvent = () => {
+    setShowDeleteModal(true)
+  }
 
+  const confirmDeleteEvent = async () => {
     try {
       await eventService.deleteEvent(id)
       toastManager.success('Evento excluído com sucesso!')
@@ -137,7 +140,7 @@ const EventDetails = () => {
         </h3>
         <Link 
           to="/events" 
-          className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium"
+          className="inline-flex items-center space-x-2 text-jibca-burgundy hover:text-jibca-burgundyHover font-medium"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Voltar para eventos</span>
@@ -152,11 +155,19 @@ const EventDetails = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      {/* Breadcrumb */}
+      <Breadcrumb 
+        items={[
+          { label: 'Eventos', href: '/events' }
+        ]}
+        current={event.title}
+      />
+
       {/* Header Corporativo */}
       <div className="flex items-center justify-between">
         <Link 
           to="/events" 
-          className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
+          className="inline-flex items-center space-x-2 text-jibca-burgundy hover:text-jibca-burgundyHover font-medium transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Voltar para eventos</span>
@@ -166,7 +177,7 @@ const EventDetails = () => {
           <div className="flex items-center space-x-3">
             <button
               onClick={() => navigate(`/events/${id}/edit`)}
-              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105"
+              className="flex items-center space-x-2 bg-jibca-burgundy hover:bg-jibca-burgundyHover text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 transform hover:scale-105"
             >
               <Edit3 className="w-4 h-4" />
               <span>Editar</span>
@@ -214,8 +225,8 @@ const EventDetails = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div className="space-y-6">
               <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <Calendar className="w-6 h-6 text-blue-600" />
+                <div className="p-3 bg-jibca-burgundy/10 rounded-xl">
+                  <Calendar className="w-6 h-6 text-jibca-burgundy" />
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900 mb-1">Data do Evento</p>
@@ -226,8 +237,8 @@ const EventDetails = () => {
               </div>
               
               <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-                <div className="p-3 bg-green-100 rounded-xl">
-                  <Clock className="w-6 h-6 text-green-600" />
+                <div className="p-3 bg-jibca-burgundy/10 rounded-xl">
+                  <Clock className="w-6 h-6 text-jibca-burgundy" />
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900 mb-1">Horário</p>
@@ -246,8 +257,8 @@ const EventDetails = () => {
             <div className="space-y-6">
               {event.location && (
                 <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-                  <div className="p-3 bg-purple-100 rounded-xl">
-                    <MapPin className="w-6 h-6 text-purple-600" />
+                  <div className="p-3 bg-jibca-gold/20 rounded-xl">
+                    <MapPin className="w-6 h-6 text-jibca-burgundy" />
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900 mb-1">Local</p>
@@ -258,8 +269,8 @@ const EventDetails = () => {
               
               {event.created_by_name && (
                 <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-                  <div className="p-3 bg-orange-100 rounded-xl">
-                    <User className="w-6 h-6 text-orange-600" />
+                  <div className="p-3 bg-jibca-gold/20 rounded-xl">
+                    <User className="w-6 h-6 text-jibca-burgundy" />
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900 mb-1">Organizador</p>
@@ -274,9 +285,6 @@ const EventDetails = () => {
           {isUpcoming && (
             <div className="border-t border-gray-200 pt-8">
               <div className="text-center">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Confirme sua presença
-                </h3>
                 <ConfirmationButton
                   eventId={id}
                   currentStatus={myConfirmation?.status}
@@ -292,8 +300,8 @@ const EventDetails = () => {
       <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
         <div className="p-8">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="p-3 bg-blue-100 rounded-xl">
-              <Users className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-jibca-burgundy/10 rounded-xl">
+              <Users className="w-6 h-6 text-jibca-burgundy" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900">
               Confirmações de Presença
@@ -339,8 +347,8 @@ const EventDetails = () => {
                     className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition-colors duration-200"
                   >
                     <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-blue-600 font-bold text-sm">
+                      <div className="w-10 h-10 bg-jibca-gold/20 rounded-full flex items-center justify-center">
+                        <span className="text-jibca-burgundy font-bold text-sm">
                           {confirmation.user_name.charAt(0).toUpperCase()}
                         </span>
                       </div>
@@ -387,6 +395,18 @@ const EventDetails = () => {
           )}
         </div>
       </div>
+
+      {/* Modal de Confirmação de Exclusão */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDeleteEvent}
+        title="Excluir Evento"
+        message={`Tem certeza que deseja excluir o evento "${event?.title}"? Esta ação não pode ser desfeita e todas as confirmações serão perdidas.`}
+        confirmText="Sim, Excluir"
+        cancelText="Cancelar"
+        type="danger"
+      />
     </div>
   )
 }

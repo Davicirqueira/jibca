@@ -28,8 +28,8 @@ const CalendarPage = () => {
       {/* Header Corporativo */}
       <div className="text-center">
         <div className="flex items-center justify-center space-x-3 mb-4">
-          <div className="p-3 bg-blue-100 rounded-xl">
-            <Calendar className="w-8 h-8 text-blue-600" />
+          <div className="p-3 bg-jibca-burgundy/10 rounded-xl">
+            <Calendar className="w-8 h-8 text-jibca-burgundy" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900">
             Calendário de Eventos
@@ -48,10 +48,10 @@ const CalendarPage = () => {
       />
 
       {/* Guia de Utilização Corporativo */}
-      <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl p-8 border border-slate-200">
+      <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-2xl p-8 border border-slate-200">
         <div className="flex items-center space-x-3 mb-6">
-          <div className="p-3 bg-blue-100 rounded-xl">
-            <Target className="w-6 h-6 text-blue-600" />
+          <div className="p-3 bg-jibca-burgundy/10 rounded-xl">
+            <Target className="w-6 h-6 text-jibca-burgundy" />
           </div>
           <h3 className="text-xl font-bold text-gray-900">
             Guia de Utilização do Sistema
@@ -60,7 +60,7 @@ const CalendarPage = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
           <div className="flex items-start space-x-3 p-4 bg-white rounded-xl border border-gray-100">
-            <MousePointer className="w-5 h-5 text-blue-600 mt-0.5" />
+            <MousePointer className="w-5 h-5 text-jibca-burgundy mt-0.5" />
             <div>
               <p className="font-semibold text-gray-900 mb-1">Seleção de Data</p>
               <p>Clique em qualquer dia para visualizar eventos programados</p>

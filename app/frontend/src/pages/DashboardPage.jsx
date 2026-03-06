@@ -63,24 +63,24 @@ const DashboardPage = () => {
       description: 'Visualize e gerencie todos os eventos da juventude',
       href: '/events',
       icon: Calendar,
-      color: 'bg-blue-600',
-      hoverColor: 'hover:bg-blue-700'
+      color: 'bg-jibca-burgundy',
+      hoverColor: 'hover:bg-jibca-burgundyHover'
     },
     {
       title: 'Visualização Calendário',
       description: 'Interface calendário para planejamento estratégico',
       href: '/calendar',
       icon: CalendarDays,
-      color: 'bg-indigo-600',
-      hoverColor: 'hover:bg-indigo-700'
+      color: 'bg-jibca-burgundy',
+      hoverColor: 'hover:bg-jibca-burgundyHover'
     },
     {
       title: 'Central de Notificações',
       description: 'Acompanhe comunicações e lembretes importantes',
       href: '/notifications',
       icon: Bell,
-      color: 'bg-red-900',
-      hoverColor: 'hover:bg-red-800',
+      color: 'bg-jibca-burgundy',
+      hoverColor: 'hover:bg-jibca-burgundyHover',
       priority: true
     },
     ...(isLeader() ? [{
@@ -88,16 +88,16 @@ const DashboardPage = () => {
       description: 'Gestão completa do cadastro de participantes',
       href: '/members',
       icon: Users,
-      color: 'bg-green-600',
-      hoverColor: 'hover:bg-green-700'
+      color: 'bg-jibca-burgundy',
+      hoverColor: 'hover:bg-jibca-burgundyHover'
     }] : []),
     {
       title: 'Configurações de Perfil',
       description: 'Atualize suas informações pessoais e preferências',
       href: '/profile',
       icon: User,
-      color: 'bg-purple-600',
-      hoverColor: 'hover:bg-purple-700'
+      color: 'bg-jibca-burgundy',
+      hoverColor: 'hover:bg-jibca-burgundyHover'
     }
   ]
 
@@ -170,16 +170,13 @@ const DashboardPage = () => {
                     <IconComponent className="w-6 h-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-jibca-burgundy transition-colors">
                       {action.title}
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed mb-4">
                       {action.description}
                     </p>
-                    <div className="flex items-center text-sm font-medium transition-colors duration-200"
-                         style={{ color: action.priority ? '#8B0000' : '#3b82f6' }}
-                         onMouseEnter={(e) => e.target.style.color = action.priority ? '#A52A2A' : '#2563eb'}
-                         onMouseLeave={(e) => e.target.style.color = action.priority ? '#8B0000' : '#3b82f6'}>
+                    <div className="flex items-center text-sm font-medium text-jibca-burgundy hover:text-jibca-burgundyHover transition-colors duration-200">
                       <span>Acessar módulo</span>
                       <ArrowRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform duration-200" />
                     </div>
@@ -197,7 +194,7 @@ const DashboardPage = () => {
           <h2 className="text-3xl font-bold text-gray-900">Calendário Mensal</h2>
           <Link 
             to="/calendar" 
-            className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            className="flex items-center space-x-2 text-jibca-burgundy hover:text-jibca-burgundyHover font-medium transition-colors"
           >
             <span>Visualização completa</span>
             <ArrowRight className="w-4 h-4" />
@@ -238,11 +235,11 @@ const DashboardPage = () => {
             {/* Eventos Programados */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 group hover:shadow-lg transition-all duration-200">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-blue-50 rounded-xl">
-                  <Calendar className="w-6 h-6 text-blue-600" />
+                <div className="p-3 bg-jibca-burgundy/10 rounded-xl">
+                  <Calendar className="w-6 h-6 text-jibca-burgundy" />
                 </div>
                 {!metricsError && (
-                  <TrendingUp className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                  <TrendingUp className="w-5 h-5 text-gray-400 group-hover:text-jibca-burgundy transition-colors" />
                 )}
                 {metricsError && (
                   <AlertCircle className="w-5 h-5 text-red-400" />
@@ -262,7 +259,7 @@ const DashboardPage = () => {
                 </>
               ) : (
                 <>
-                  <h3 className="text-3xl font-bold text-blue-600 mb-1">{metrics.eventsCount}</h3>
+                  <h3 className="text-3xl font-bold text-jibca-burgundy mb-1">{metrics.eventsCount}</h3>
                   <p className="text-gray-600 font-medium">Eventos Programados</p>
                   <p className="text-xs text-gray-500 mt-2">Eventos futuros cadastrados</p>
                 </>
@@ -341,10 +338,10 @@ const DashboardPage = () => {
       )}
 
       {/* Seção Inspiracional Corporativa */}
-      <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl p-8 border border-slate-200">
+      <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-2xl p-8 border border-slate-200">
         <div className="text-center max-w-4xl mx-auto">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+          <div className="w-16 h-16 bg-jibca-gold/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-jibca-gold" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" clipRule="evenodd" />
               <path d="M8 6h4v2H8V6zM8 10h4v2H8v-2z" />
             </svg>
@@ -352,7 +349,7 @@ const DashboardPage = () => {
           <blockquote className="text-2xl text-slate-700 font-medium leading-relaxed mb-6 font-serif">
             "Ninguém o despreze pelo fato de você ser jovem"
           </blockquote>
-          <cite className="text-blue-600 font-semibold text-lg">1 Timóteo 4:12</cite>
+          <cite className="text-jibca-burgundy font-semibold text-lg">1 Timóteo 4:12</cite>
           <div className="mt-4 text-sm text-slate-500 font-medium">
             Fundamento espiritual da JIBCA - Juventude da Igreja Batista Castro Alves
           </div>

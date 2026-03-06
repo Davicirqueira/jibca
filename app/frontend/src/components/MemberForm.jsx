@@ -304,17 +304,17 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
   return (
     <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
       {/* Header Corporativo */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white p-6">
+      <div className="bg-gradient-to-r from-jibca-burgundy to-jibca-burgundyPressed text-white p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
-              {memberId ? <User className="w-8 h-8 text-white" /> : <UserPlus className="w-8 h-8 text-white" />}
+            <div className="p-3 bg-jibca-gold/20 rounded-xl backdrop-blur-sm">
+              {memberId ? <User className="w-8 h-8 text-jibca-gold" /> : <UserPlus className="w-8 h-8 text-jibca-gold" />}
             </div>
             <div>
               <h1 className="text-3xl font-bold">
                 {memberId ? 'Editar Membro' : 'Novo Membro'}
               </h1>
-              <p className="text-slate-200 text-sm font-medium">
+              <p className="text-jibca-gold/90 text-sm font-medium">
                 Sistema de Gestão de Membros JIBCA
               </p>
             </div>
@@ -335,7 +335,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
         {/* Nome Completo */}
         <div className="space-y-2">
           <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-            <User className="w-4 h-4 text-blue-600" />
+            <User className="w-4 h-4 text-jibca-gold" />
             <span>Nome Completo</span>
             <span className="text-red-500">*</span>
           </label>
@@ -352,7 +352,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
                   ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                   : isFieldValid('name')
                   ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                  : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                  : 'border-gray-300 focus:ring-jibca-burgundy focus:border-jibca-burgundy'
               }`}
               disabled={loading}
             />
@@ -376,7 +376,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
           {/* Email */}
           <div className="space-y-2">
             <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-              <Mail className="w-4 h-4 text-blue-600" />
+              <Mail className="w-4 h-4 text-jibca-gold" />
               <span>Email</span>
               <span className="text-red-500">*</span>
             </label>
@@ -393,7 +393,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
                     ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                     : isFieldValid('email')
                     ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                    : 'border-gray-300 focus:ring-jibca-burgundy focus:border-jibca-burgundy'
                 }`}
                 disabled={loading}
               />
@@ -415,7 +415,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
           {/* Telefone */}
           <div className="space-y-2">
             <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-              <Phone className="w-4 h-4 text-blue-600" />
+              <Phone className="w-4 h-4 text-jibca-gold" />
               <span>Telefone</span>
               <span className="text-gray-400 text-xs">(opcional)</span>
             </label>
@@ -432,7 +432,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
                     ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                     : isFieldValid('phone')
                     ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                    : 'border-gray-300 focus:ring-jibca-burgundy focus:border-jibca-burgundy'
                 }`}
                 disabled={loading}
               />
@@ -457,7 +457,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
           {/* Função */}
           <div className="space-y-2">
             <label className="flex items-center space-x-2 text-sm font-semibold text-gray-900">
-              <Shield className="w-4 h-4 text-blue-600" />
+              <Shield className="w-4 h-4 text-jibca-burgundy" />
               <span>Função no Sistema</span>
               <span className="text-red-500">*</span>
             </label>
@@ -472,7 +472,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
                     ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                     : isFieldValid('role')
                     ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                    : 'border-gray-300 focus:ring-jibca-burgundy focus:border-jibca-burgundy'
                 }`}
                 disabled={loading}
               >
@@ -515,7 +515,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
                     ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                     : isFieldValid('password')
                     ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                    : 'border-gray-300 focus:ring-jibca-burgundy focus:border-jibca-burgundy'
                 }`}
                 disabled={loading}
                 readOnly={!memberId && !formData.password}
@@ -535,11 +535,11 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
               </p>
             )}
             {!memberId && generatedPassword && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-blue-800 text-sm font-medium">
-                  Senha gerada automaticamente: <code className="bg-blue-100 px-2 py-1 rounded font-mono">{generatedPassword}</code>
+              <div className="bg-jibca-gold/10 border border-jibca-gold/30 rounded-lg p-3">
+                <p className="text-gray-800 text-sm font-medium">
+                  Senha gerada automaticamente: <code className="bg-jibca-gold/20 px-2 py-1 rounded font-mono">{generatedPassword}</code>
                 </p>
-                <p className="text-blue-600 text-xs mt-1">
+                <p className="text-gray-600 text-xs mt-1">
                   O membro deverá alterar esta senha no primeiro acesso
                 </p>
               </div>
@@ -555,11 +555,11 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
               name="active"
               checked={formData.active}
               onChange={handleInputChange}
-              className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              className="w-5 h-5 text-jibca-burgundy border-gray-300 rounded focus:ring-jibca-burgundy focus:ring-2"
               disabled={loading}
             />
             <div className="flex items-center space-x-2">
-              <Shield className="w-4 h-4 text-blue-600" />
+              <Shield className="w-4 h-4 text-jibca-burgundy" />
               <span className="text-sm font-semibold text-gray-900">Membro Ativo</span>
             </div>
           </label>
@@ -582,7 +582,7 @@ const MemberForm = ({ memberId = null, onClose = null, onSuccess = null }) => {
 
           <button
             type="submit"
-            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="flex items-center space-x-2 bg-jibca-burgundy hover:bg-jibca-burgundyHover text-white px-8 py-3 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             disabled={loading}
           >
             {loading ? (

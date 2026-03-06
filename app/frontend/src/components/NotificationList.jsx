@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { notificationService } from '../services/notificationService'
 import NotificationCard from './NotificationCard'
 import LoadingSpinner from './LoadingSpinner'
+import ConfirmationModal from './ConfirmationModal'
 import { toastManager } from '../utils/ToastManager'
 import { 
   Bell, 
@@ -13,7 +14,8 @@ import {
   EyeOff,
   ChevronLeft,
   ChevronRight,
-  Inbox
+  Inbox,
+  Trash2
 } from 'lucide-react'
 
 const NotificationList = () => {
@@ -24,6 +26,7 @@ const NotificationList = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalNotifications, setTotalNotifications] = useState(0)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [stats, setStats] = useState({
     total: 0,
     unread: 0,
@@ -161,6 +164,58 @@ const NotificationList = () => {
     }
   }
 
+  const handleDeleteNotification = async (notificationId) => {
+    try {
+      await notificationService.deleteNotification(notificationId)
+      
+      // Remover localmente
+      setNotifications(prev => prev.filter(n => n.id !== notificationId))
+      
+      // Atualizar estatísticas
+      const deletedNotification = notifications.find(n => n.id === notificationId)
+      if (deletedNotification) {
+        setStats(prev => ({
+          total: Math.max(0, prev.total - 1),
+          unread: deletedNotification.read_at ? prev.unread : Math.max(0, prev.unread - 1),
+          read: deletedNotification.read_at ? Math.max(0, prev.read - 1) : prev.read
+        }))
+      }
+
+      toastManager.success('Notificação removida')
+    } catch (error) {
+      console.error('Erro ao deletar notificação:', error)
+      toastManager.error('Erro ao remover notificação')
+    }
+  }
+
+  const handleDeleteAllRead = async () => {
+    setShowDeleteModal(true)
+  }
+
+  const confirmDeleteAllRead = async () => {
+    try {
+      await notificationService.deleteAllRead()
+      
+      // Remover todas as lidas localmente
+      setNotifications(prev => prev.filter(n => !n.read_at))
+      
+      // Atualizar estatísticas
+      setStats(prev => ({
+        total: prev.unread,
+        unread: prev.unread,
+        read: 0
+      }))
+
+      toastManager.success('Todas as notificações lidas foram removidas')
+      
+      // Recarregar para garantir sincronização
+      await loadNotifications()
+    } catch (error) {
+      console.error('Erro ao deletar notificações lidas:', error)
+      toastManager.error('Erro ao remover notificações lidas')
+    }
+  }
+
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter)
     setCurrentPage(1)
@@ -176,8 +231,8 @@ const NotificationList = () => {
       {/* Header Corporativo */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-blue-100 rounded-xl">
-            <Bell className="w-8 h-8 text-blue-600" />
+          <div className="p-3 bg-jibca-burgundy/10 rounded-xl">
+            <Bell className="w-8 h-8 text-jibca-burgundy" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
@@ -202,10 +257,20 @@ const NotificationList = () => {
           {stats.unread > 0 && (
             <button
               onClick={handleMarkAllAsRead}
-              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200"
+              className="flex items-center space-x-2 bg-jibca-burgundy hover:bg-jibca-burgundyHover text-white px-4 py-2 rounded-xl font-medium transition-all duration-200"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Marcar Todas como Lidas</span>
+            </button>
+          )}
+
+          {stats.read > 0 && (
+            <button
+              onClick={handleDeleteAllRead}
+              className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Limpar Lidas</span>
             </button>
           )}
         </div>
@@ -215,8 +280,8 @@ const NotificationList = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-all duration-200">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-blue-50 rounded-xl">
-              <Bell className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-jibca-burgundy/10 rounded-xl">
+              <Bell className="w-6 h-6 text-jibca-burgundy" />
             </div>
           </div>
           <h3 className="text-3xl font-bold text-gray-900 mb-1">{stats.total}</h3>
@@ -261,7 +326,7 @@ const NotificationList = () => {
                   onClick={() => handleFilterChange(option.key)}
                   className={`flex items-center space-x-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     filter === option.key
-                      ? 'bg-white text-blue-600 shadow-sm'
+                      ? 'bg-white text-jibca-burgundy shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
@@ -273,7 +338,7 @@ const NotificationList = () => {
           </div>
 
           <div className="text-sm text-gray-500 font-medium">
-            {totalNotifications} notificação{totalNotifications !== 1 ? 'ões' : ''} encontrada{totalNotifications !== 1 ? 's' : ''}
+            {totalNotifications} notifica{totalNotifications !== 1 ? 'ções' : 'ção'} encontrada{totalNotifications !== 1 ? 's' : ''}
           </div>
         </div>
       </div>
@@ -309,6 +374,7 @@ const NotificationList = () => {
                 key={notification.id}
                 notification={notification}
                 onMarkAsRead={handleMarkAsRead}
+                onDelete={handleDeleteNotification}
               />
             ))}
           </div>
@@ -349,7 +415,7 @@ const NotificationList = () => {
                         onClick={() => handlePageChange(pageNum)}
                         className={`w-10 h-10 rounded-lg text-sm font-medium transition-all duration-200 ${
                           currentPage === pageNum
-                            ? 'bg-blue-600 text-white'
+                            ? 'bg-jibca-burgundy text-white'
                             : 'text-gray-700 hover:bg-gray-100'
                         }`}
                       >
@@ -372,6 +438,18 @@ const NotificationList = () => {
           )}
         </>
       )}
+
+      {/* Modal de Confirmação */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDeleteAllRead}
+        title="Remover Notificações Lidas"
+        message="Tem certeza que deseja remover todas as notificações lidas? Esta ação não pode ser desfeita."
+        confirmText="Sim, Remover"
+        cancelText="Cancelar"
+        type="danger"
+      />
     </div>
   )
 }

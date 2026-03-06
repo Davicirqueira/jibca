@@ -43,7 +43,7 @@ const NotificationBadge = ({ className = '' }) => {
       )}
       
       {loading && (
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-ping"></div>
+        <div className="absolute -top-1 -right-1 w-3 h-3 bg-jibca-burgundy rounded-full animate-ping"></div>
       )}
     </div>
   )
