@@ -69,6 +69,9 @@ if (process.env.NODE_ENV === 'development') {
   app.use(sanitizationLogger);
 }
 
+// Servir arquivos estáticos (uploads)
+app.use('/uploads', express.static('uploads'));
+
 // Rotas da API
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);

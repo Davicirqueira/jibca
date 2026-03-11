@@ -113,5 +113,32 @@ export const userService = {
     } catch (error) {
       throw error
     }
+  },
+
+  // Upload de avatar do usuário logado
+  async uploadAvatar(file) {
+    try {
+      const formData = new FormData()
+      formData.append('avatar', file)
+
+      const response = await api.post('/profile/avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      return response.data.data.user
+    } catch (error) {
+      throw error
+    }
+  },
+
+  // Remover avatar do usuário logado
+  async deleteAvatar() {
+    try {
+      const response = await api.delete('/profile/avatar')
+      return response.data.data.user
+    } catch (error) {
+      throw error
+    }
   }
 }

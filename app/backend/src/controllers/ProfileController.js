@@ -77,7 +77,7 @@ class ProfileController {
       const { name, phone } = req.body;
 
       // Validar que pelo menos um campo foi enviado
-      if (!name && phone === undefined) {
+      if (!name?.trim() && phone === undefined) {
         return res.status(400).json({
           success: false,
           error: {
@@ -89,7 +89,7 @@ class ProfileController {
 
       // Preparar dados para atualização (sem email e role por segurança)
       const updateData = {};
-      if (name) updateData.name = name.trim();
+      if (name?.trim()) updateData.name = name.trim();
       if (phone !== undefined) updateData.phone = phone ? phone.trim() : null;
 
       // Atualizar perfil
@@ -237,6 +237,172 @@ class ProfileController {
         error: {
           code: 'UPDATE_PASSWORD_ERROR',
           message: 'Erro interno ao atualizar senha'
+        }
+      });
+    }
+  }
+
+  /**
+   * Upload de avatar do usuário logado
+   * POST /api/v1/profile/avatar
+   */
+  static async uploadAvatar(req, res) {
+    try {
+      const userId = req.user.id;
+
+      // Verificar se arquivo foi enviado
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'NO_FILE',
+            message: 'Nenhum arquivo foi enviado'
+          }
+        });
+      }
+
+      const UploadService = require('../services/UploadService');
+
+      // Buscar avatar atual para deletar depois
+      const currentUser = await UserRepository.findById(userId);
+      const oldAvatarUrl = currentUser?.avatar_url;
+
+      // Fazer upload do novo avatar
+      const avatarUrl = await UploadService.uploadAvatar(req.file, userId);
+
+      // Atualizar avatar_url no banco de dados
+      const updatedUser = await UserRepository.update(userId, { avatar_url: avatarUrl });
+
+      if (!updatedUser) {
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'UPDATE_FAILED',
+            message: 'Falha ao atualizar avatar no banco de dados'
+          }
+        });
+      }
+
+      // Deletar avatar antigo (se existir)
+      if (oldAvatarUrl) {
+        try {
+          await UploadService.deleteAvatar(oldAvatarUrl);
+        } catch (error) {
+          console.warn('Aviso: Não foi possível deletar avatar antigo:', error.message);
+          // Não falhar a requisição por isso
+        }
+      }
+
+      console.log(`✅ Avatar atualizado para usuário ID: ${userId}`);
+
+      res.json({
+        success: true,
+        data: {
+          user: {
+            id: updatedUser.id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            phone: updatedUser.phone,
+            avatar_url: updatedUser.avatar_url,
+            active: updatedUser.is_active,
+            is_active: updatedUser.is_active,
+            created_at: updatedUser.created_at,
+            updated_at: updatedUser.updated_at
+          }
+        },
+        message: 'Avatar atualizado com sucesso'
+      });
+
+    } catch (error) {
+      console.error('Erro ao fazer upload de avatar:', error);
+
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'UPLOAD_AVATAR_ERROR',
+          message: error.message || 'Erro interno ao fazer upload de avatar'
+        }
+      });
+    }
+  }
+
+  /**
+   * Remover avatar do usuário logado
+   * DELETE /api/v1/profile/avatar
+   */
+  static async deleteAvatar(req, res) {
+    try {
+      const userId = req.user.id;
+
+      // Buscar avatar atual
+      const currentUser = await UserRepository.findById(userId);
+      
+      if (!currentUser) {
+        return res.status(404).json({
+          success: false,
+          error: {
+            code: 'USER_NOT_FOUND',
+            message: 'Usuário não encontrado'
+          }
+        });
+      }
+
+      const avatarUrl = currentUser.avatar_url;
+
+      // Atualizar avatar_url para NULL no banco de dados
+      const updatedUser = await UserRepository.update(userId, { avatar_url: null });
+
+      if (!updatedUser) {
+        return res.status(500).json({
+          success: false,
+          error: {
+            code: 'UPDATE_FAILED',
+            message: 'Falha ao remover avatar no banco de dados'
+          }
+        });
+      }
+
+      // Deletar arquivo físico (se existir)
+      if (avatarUrl) {
+        try {
+          const UploadService = require('../services/UploadService');
+          await UploadService.deleteAvatar(avatarUrl);
+        } catch (error) {
+          console.warn('Aviso: Não foi possível deletar arquivo de avatar:', error.message);
+          // Não falhar a requisição por isso
+        }
+      }
+
+      console.log(`✅ Avatar removido para usuário ID: ${userId}`);
+
+      res.json({
+        success: true,
+        data: {
+          user: {
+            id: updatedUser.id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            phone: updatedUser.phone,
+            avatar_url: updatedUser.avatar_url,
+            active: updatedUser.is_active,
+            is_active: updatedUser.is_active,
+            created_at: updatedUser.created_at,
+            updated_at: updatedUser.updated_at
+          }
+        },
+        message: 'Avatar removido com sucesso'
+      });
+
+    } catch (error) {
+      console.error('Erro ao remover avatar:', error);
+
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'DELETE_AVATAR_ERROR',
+          message: 'Erro interno ao remover avatar'
         }
       });
     }

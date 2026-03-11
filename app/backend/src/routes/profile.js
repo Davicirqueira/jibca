@@ -2,6 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const ProfileController = require('../controllers/ProfileController');
 const { auth } = require('../middleware/auth');
+const { uploadAvatar } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -51,5 +52,9 @@ const updatePasswordValidation = [
 router.get('/', auth, ProfileController.getProfile);
 router.put('/', auth, updateProfileValidation, ProfileController.updateProfile);
 router.put('/password', auth, updatePasswordValidation, ProfileController.updatePassword);
+
+// Rotas de avatar
+router.post('/avatar', auth, uploadAvatar, ProfileController.uploadAvatar);
+router.delete('/avatar', auth, ProfileController.deleteAvatar);
 
 module.exports = router;

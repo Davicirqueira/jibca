@@ -199,6 +199,190 @@ describe('UserController', () => {
         }
       });
     });
+
+    it('should create user with role "leader" when specified', async () => {
+      // Arrange
+      req.body = {
+        name: 'New Leader',
+        email: 'leader@test.com',
+        phone: '987654321',
+        password: 'password123',
+        role: 'leader'
+      };
+
+      validationResult.mockReturnValue({
+        isEmpty: () => true,
+        array: () => []
+      });
+
+      UserRepository.emailExists.mockResolvedValue(false);
+      AuthService.hashPassword.mockResolvedValue('hashed_password');
+      
+      const mockNewUser = {
+        id: 4,
+        name: 'New Leader',
+        email: 'leader@test.com',
+        role: 'leader',
+        phone: '987654321',
+        is_active: true,
+        created_at: '2026-02-02T19:40:00Z'
+      };
+      
+      UserRepository.create.mockResolvedValue(mockNewUser);
+
+      // Act
+      await UserController.create(req, res);
+
+      // Assert
+      expect(UserRepository.create).toHaveBeenCalledWith({
+        name: 'New Leader',
+        email: 'leader@test.com',
+        password_hash: 'hashed_password',
+        role: 'leader',
+        phone: '987654321'
+      });
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: {
+          user: {
+            id: 4,
+            name: 'New Leader',
+            email: 'leader@test.com',
+            role: 'leader',
+            phone: '987654321',
+            active: true,
+            is_active: true,
+            created_at: '2026-02-02T19:40:00Z'
+          }
+        },
+        message: 'Membro criado com sucesso'
+      });
+    });
+
+    it('should create user with role "member" when specified', async () => {
+      // Arrange
+      req.body = {
+        name: 'New Member',
+        email: 'member@test.com',
+        password: 'password123',
+        role: 'member'
+      };
+
+      validationResult.mockReturnValue({
+        isEmpty: () => true,
+        array: () => []
+      });
+
+      UserRepository.emailExists.mockResolvedValue(false);
+      AuthService.hashPassword.mockResolvedValue('hashed_password');
+      
+      const mockNewUser = {
+        id: 5,
+        name: 'New Member',
+        email: 'member@test.com',
+        role: 'member',
+        phone: null,
+        is_active: true,
+        created_at: '2026-02-02T19:40:00Z'
+      };
+      
+      UserRepository.create.mockResolvedValue(mockNewUser);
+
+      // Act
+      await UserController.create(req, res);
+
+      // Assert
+      expect(UserRepository.create).toHaveBeenCalledWith({
+        name: 'New Member',
+        email: 'member@test.com',
+        password_hash: 'hashed_password',
+        role: 'member',
+        phone: undefined
+      });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          data: expect.objectContaining({
+            user: expect.objectContaining({
+              role: 'member'
+            })
+          })
+        })
+      );
+    });
+
+    it('should default to "member" role when role is not specified', async () => {
+      // Arrange
+      req.body = {
+        name: 'Default Member',
+        email: 'default@test.com',
+        password: 'password123'
+      };
+
+      validationResult.mockReturnValue({
+        isEmpty: () => true,
+        array: () => []
+      });
+
+      UserRepository.emailExists.mockResolvedValue(false);
+      AuthService.hashPassword.mockResolvedValue('hashed_password');
+      
+      const mockNewUser = {
+        id: 6,
+        name: 'Default Member',
+        email: 'default@test.com',
+        role: 'member',
+        phone: null,
+        is_active: true,
+        created_at: '2026-02-02T19:40:00Z'
+      };
+      
+      UserRepository.create.mockResolvedValue(mockNewUser);
+
+      // Act
+      await UserController.create(req, res);
+
+      // Assert
+      expect(UserRepository.create).toHaveBeenCalledWith({
+        name: 'Default Member',
+        email: 'default@test.com',
+        password_hash: 'hashed_password',
+        role: 'member',
+        phone: undefined
+      });
+    });
+
+    it('should reject invalid role value', async () => {
+      // Arrange
+      req.body = {
+        name: 'Invalid Role User',
+        email: 'invalid@test.com',
+        password: 'password123',
+        role: 'admin'
+      };
+
+      validationResult.mockReturnValue({
+        isEmpty: () => true,
+        array: () => []
+      });
+
+      UserRepository.emailExists.mockResolvedValue(false);
+
+      // Act
+      await UserController.create(req, res);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        error: {
+          code: 'INVALID_ROLE',
+          message: 'Role deve ser "leader" ou "member"'
+        }
+      });
+      expect(UserRepository.create).not.toHaveBeenCalled();
+    });
   });
 
   describe('list', () => {
@@ -233,6 +417,138 @@ describe('UserController', () => {
           pagination: mockResult.pagination
         }
       });
+    });
+  });
+
+  describe('update', () => {
+    it('should update user role from member to leader', async () => {
+      // Arrange
+      req.params.id = '2';
+      req.body = {
+        role: 'leader'
+      };
+
+      validationResult.mockReturnValue({
+        isEmpty: () => true,
+        array: () => []
+      });
+
+      const existingUser = {
+        id: 2,
+        name: 'Test User',
+        email: 'test@test.com',
+        role: 'member',
+        is_active: true
+      };
+
+      const updatedUser = {
+        ...existingUser,
+        role: 'leader',
+        updated_at: '2026-02-02T20:00:00Z'
+      };
+
+      UserRepository.findById.mockResolvedValue(existingUser);
+      UserRepository.update.mockResolvedValue(updatedUser);
+
+      // Act
+      await UserController.update(req, res);
+
+      // Assert
+      expect(UserRepository.update).toHaveBeenCalledWith(2, { role: 'leader' });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          data: expect.objectContaining({
+            user: expect.objectContaining({
+              role: 'leader'
+            })
+          })
+        })
+      );
+    });
+
+    it('should update user role from leader to member', async () => {
+      // Arrange
+      req.params.id = '3';
+      req.body = {
+        role: 'member'
+      };
+
+      validationResult.mockReturnValue({
+        isEmpty: () => true,
+        array: () => []
+      });
+
+      const existingUser = {
+        id: 3,
+        name: 'Test Leader',
+        email: 'leader@test.com',
+        role: 'leader',
+        is_active: true
+      };
+
+      const updatedUser = {
+        ...existingUser,
+        role: 'member',
+        updated_at: '2026-02-02T20:00:00Z'
+      };
+
+      UserRepository.findById.mockResolvedValue(existingUser);
+      UserRepository.update.mockResolvedValue(updatedUser);
+
+      // Act
+      await UserController.update(req, res);
+
+      // Assert
+      expect(UserRepository.update).toHaveBeenCalledWith(3, { role: 'member' });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          data: expect.objectContaining({
+            user: expect.objectContaining({
+              role: 'member'
+            })
+          })
+        })
+      );
+    });
+
+    it('should ignore invalid role values in update', async () => {
+      // Arrange
+      req.params.id = '2';
+      req.body = {
+        name: 'Updated Name',
+        role: 'admin' // Invalid role
+      };
+
+      validationResult.mockReturnValue({
+        isEmpty: () => true,
+        array: () => []
+      });
+
+      const existingUser = {
+        id: 2,
+        name: 'Test User',
+        email: 'test@test.com',
+        role: 'member',
+        is_active: true
+      };
+
+      const updatedUser = {
+        ...existingUser,
+        name: 'Updated Name',
+        updated_at: '2026-02-02T20:00:00Z'
+      };
+
+      UserRepository.findById.mockResolvedValue(existingUser);
+      UserRepository.update.mockResolvedValue(updatedUser);
+
+      // Act
+      await UserController.update(req, res);
+
+      // Assert
+      // Should only update name, not role (invalid role is ignored)
+      expect(UserRepository.update).toHaveBeenCalledWith(2, { name: 'Updated Name' });
     });
   });
 });

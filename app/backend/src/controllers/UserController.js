@@ -22,7 +22,7 @@ class UserController {
         });
       }
 
-      const { name, email, phone, password } = req.body;
+      const { name, email, phone, password, role } = req.body;
 
       // Verificar se email já existe
       const emailExists = await UserRepository.emailExists(email);
@@ -36,6 +36,17 @@ class UserController {
         });
       }
 
+      // Validar role se fornecido
+      if (role && !['leader', 'member'].includes(role)) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_ROLE',
+            message: 'Role deve ser "leader" ou "member"'
+          }
+        });
+      }
+
       // Gerar hash da senha
       const password_hash = await AuthService.hashPassword(password);
 
@@ -44,7 +55,7 @@ class UserController {
         name: name.trim(),
         email: email.toLowerCase(),
         password_hash,
-        role: 'member', // Sempre criar como membro
+        role: role || 'member', // Usar role enviado ou 'member' como padrão
         phone: phone?.trim()
       };
 

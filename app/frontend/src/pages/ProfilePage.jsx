@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { userService } from '../services/userService'
 import LoadingSpinner from '../components/LoadingSpinner'
 import Breadcrumb from '../components/Breadcrumb'
+import AvatarUpload from '../components/AvatarUpload'
 import { toastManager } from '../utils/ToastManager'
 import { 
   User,
@@ -12,7 +13,6 @@ import {
   Edit3,
   Save,
   X,
-  Camera,
   Settings,
   Bell,
   Lock,
@@ -206,13 +206,21 @@ const ProfilePage = () => {
       if (error.response?.data?.message) {
         if (error.response.data.message.includes('senha atual')) {
           setErrors({ currentPassword: 'Senha atual incorreta' })
+          toastManager.error('Senha atual incorreta')
         } else if (error.response.data.message.includes('email')) {
           setErrors({ email: 'Este email já está em uso' })
+          toastManager.error('Este email já está em uso')
+        } else if (error.response.data.message.includes('telefone')) {
+          setErrors({ phone: 'Formato de telefone inválido' })
+          toastManager.error('Formato de telefone inválido')
         } else {
           toastManager.error(error.response.data.message)
         }
+      } else if (error.request) {
+        // Erro de rede - requisição foi feita mas não houve resposta
+        toastManager.error('Erro de conexão. Verifique sua internet e tente novamente')
       } else {
-        toastManager.error('Erro ao atualizar perfil')
+        toastManager.error('Erro ao atualizar perfil. Tente novamente')
       }
     } finally {
       setLoading(false)
@@ -253,6 +261,16 @@ const ProfilePage = () => {
       .join('')
       .toUpperCase()
       .slice(0, 2) || 'U'
+  }
+
+  const handleAvatarUploadSuccess = (updatedUser) => {
+    // Atualizar contexto de autenticação com novo avatar_url
+    updateUser(updatedUser)
+  }
+
+  const handleAvatarDeleteSuccess = (updatedUser) => {
+    // Atualizar contexto de autenticação após remover avatar
+    updateUser(updatedUser)
   }
 
   return (
@@ -297,18 +315,13 @@ const ProfilePage = () => {
         <div className="text-white p-8" style={{ background: 'linear-gradient(135deg, #8B0000 0%, #6B0000 100%)' }}>
           <div className="flex items-center space-x-6">
             {/* Avatar */}
-            <div className="relative">
-              <div className="w-24 h-24 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/20">
-                <span className="text-2xl font-bold text-white">
-                  {getInitials(user?.name)}
-                </span>
-              </div>
-              {isEditing && (
-                <button className="absolute -bottom-2 -right-2 p-2 bg-jibca-burgundy hover:bg-jibca-burgundyHover rounded-full text-white transition-colors duration-200">
-                  <Camera className="w-4 h-4" />
-                </button>
-              )}
-            </div>
+            <AvatarUpload
+              currentAvatarUrl={user?.avatar_url}
+              userName={user?.name}
+              onUploadSuccess={handleAvatarUploadSuccess}
+              onDeleteSuccess={handleAvatarDeleteSuccess}
+              size="large"
+            />
 
             {/* Informações Básicas */}
             <div className="flex-1">
