@@ -87,7 +87,7 @@ const AvatarUpload = ({
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/profile/avatar`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('jibca_token')}`
         },
         body: formData
       })
@@ -146,7 +146,7 @@ const AvatarUpload = ({
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/profile/avatar`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('jibca_token')}`
         }
       })
 

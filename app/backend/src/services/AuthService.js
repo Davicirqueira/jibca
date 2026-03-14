@@ -13,7 +13,7 @@ class AuthService {
     try {
       // Buscar usuário por email
       const userResult = await query(
-        'SELECT id, name, email, password_hash, role, is_active FROM users WHERE email = $1',
+        'SELECT id, name, email, password_hash, role, phone, is_active FROM users WHERE email = $1',
         [email.toLowerCase()]
       );
 
@@ -77,7 +77,7 @@ class AuthService {
       
       // Verificar se usuário ainda existe e está ativo
       const userResult = await query(
-        'SELECT id, name, email, role, is_active FROM users WHERE id = $1',
+        'SELECT id, name, email, role, phone, is_active FROM users WHERE id = $1',
         [decoded.userId]
       );
 
@@ -166,7 +166,7 @@ class AuthService {
     try {
       // Buscar usuário por email
       const userResult = await query(
-        'SELECT id, name, email, is_active FROM users WHERE email = $1',
+        'SELECT id, name, email, phone, is_active FROM users WHERE email = $1',
         [email.toLowerCase()]
       );
 
