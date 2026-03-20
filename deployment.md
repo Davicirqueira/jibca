@@ -13,3 +13,5 @@ Dica sobre o "Esqueci a Senha"Como você mencionou essa funcionalidade, se usar 
 
 
 O próprio Supabase envia o e-mail e, quando o jovem clicar no link, ele será levado para a página que você criou para digitar a nova senha.Resumo de Recomendações de Hospedagem Gratuita:ComponenteOpção A (Recomendada)Opção B (Tradicional)FrontendVercelNetlifyBanco de DadosSupabase (PostgreSQL)Neon.techBackend (Node)Supabase FunctionsRender.com
+
+Alimentar essa ideia.
